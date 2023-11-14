@@ -1,19 +1,20 @@
 help:
-	@echo "-------------------------------------------------------------------------------------------"
-	@echo "----------------------------------- COMANDOS DO PROJETO -----------------------------------"
-	@echo "-------------------------------------------------------------------------------------------"
-	@echo "- Ambiente de desenvolvimento -------------------------------------------------------------"
+	@echo "-----------------------------------------------------------------------------------------------"
+	@echo "------------------------------------- COMANDOS DO PROJETO -------------------------------------"
+	@echo "-----------------------------------------------------------------------------------------------"
+	@echo "- Ambiente de desenvolvimento -----------------------------------------------------------------"
 	@echo "# make dev-start       =====>> inicia o ambiente de desenvolvimento"
 	@echo "# make dev-stop        =====>> interrompe o ambiente de desenvolvimento"
 	@echo "# make dev-init-load   =====>> carrega as informações iniciais no banco de dados"
 	@echo "# make dev-drop-tables =====>> remove todos os registros do banco de dados"
-	@echo "-------------------------------------------------------------------------------------------"
-	@echo "- Comandos da aplicação -------------------------------------------------------------------"
+	@echo "-----------------------------------------------------------------------------------------------"
+	@echo "- Comandos da aplicação -----------------------------------------------------------------------"
 	@echo "# make test            =====>> Executa os testes unitários do projeto"
 	@echo "# make build-go-app    =====>> Faz o build da aplicação e gera o binário em ./build/app/"
 	@echo "# make build-image     =====>> Gera a imagem docker do projeto"
 	@echo "# make push-image      =====>> Envia a imagem docker para o repositório de imagens"
-	@echo "-------------------------------------------------------------------------------------------"
+	@echo "# make doc-generate    =====>> Gera a documentação em swagger e também converte para markdown"
+	@echo "-----------------------------------------------------------------------------------------------"
 
 dev-start:
 	docker compose -f build/dev/docker-compose.yml up -d
@@ -47,5 +48,8 @@ push-image: build-image
 	@echo "docker push ruanlas/$(IMAGE_NAME):$(TAG)"
 
 doc-generate:
-	docker run --rm -it -v "$(PWD):/work" ruanlas/go-swagger-generator:v0.1.0 swag init -g cmd/main.go
-	docker run --rm -it -v "$(PWD):/work" ruanlas/swagger-to-markdown-convert:v0.1.0 swagger-markdown -i ./docs/swagger.yaml -o ./api_doc.md
+	@echo "Gerando documentação do swagger"
+	docker run --rm -it -v "$(PWD):/work" ruanlas/go-swagger-generator:v1.0.0 swag init -g cmd/main.go
+	@echo "Convertendo a documentação do swagger em markdown"
+	docker run --rm -it -v "$(PWD):/work" ruanlas/swagger-to-markdown-convert:v1.0.0 swagger-markdown -i ./docs/swagger.yaml -o ./api_doc.md
+	@echo "Concluído"
