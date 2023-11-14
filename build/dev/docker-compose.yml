@@ -23,6 +23,7 @@ services:
     
   apm-server:
     image: docker.elastic.co/apm/apm-server:7.17.14
+    container_name: apm-server
     depends_on:
       elasticsearch-apm:
         condition: service_healthy
@@ -49,6 +50,7 @@ services:
 
   elasticsearch-apm:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.14
+    container_name: elasticsearch-apm
     environment:
     - bootstrap.memory_lock=true
     - cluster.name=docker-cluster
@@ -72,6 +74,7 @@ services:
 
   kibana-apm:
     image: docker.elastic.co/kibana/kibana:7.17.14
+    container_name: kibana-apm
     depends_on:
       elasticsearch-apm:
         condition: service_healthy
@@ -86,9 +89,45 @@ services:
       interval: 10s
       retries: 20
       test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:5601/api/status
+
+  keycloack-db:
+    image: mysql:8.2.0
+    container_name: keycloack-db
+    volumes:
+      - keycloack_data:/var/lib/mysql
+    networks:
+    - wallet-network
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+  
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.5
+    container_name: keycloak
+    networks:
+    - wallet-network
+    environment:
+      DB_VENDOR: MYSQL
+      DB_ADDR: keycloack-db
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: 123456
+      # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the MySQL JDBC driver documentation in order to use it.
+      #JDBC_PARAMS: "connectTimeout=30000"
+    ports:
+      - 8081:8080
+    command: start-dev
+    depends_on:
+      - keycloack-db
   
 volumes:
   esdata:
+    driver: local
+  keycloack_data:
     driver: local
 
 networks:

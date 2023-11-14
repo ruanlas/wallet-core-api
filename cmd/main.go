@@ -1,8 +1,57 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"os"
 
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"go.elastic.co/apm"
+)
+
+func init() {
+	env := os.Getenv("ENV")
+	if env == "" {
+		godotenv.Load()
+	}
+	log.Println("ELASTIC_APM_SERVICE_NAME:", os.Getenv("ELASTIC_APM_SERVICE_NAME"))
+	go startPrometheus()
+}
+
+// @title Wallet Core
+// @version 0.1.0
+// @description API que dispões de recursos para gerenciar as finanças pessoais
+// @host localhost:8080
+// @BasePath /api/
 func main() {
 	fmt.Println("Project Started!")
 
+	r := gin.Default()
+
+	// docs.SwaggerInfo.BasePath = "/api"
+	r.GET("/", func(c *gin.Context) {
+
+		tx := apm.TransactionFromContext(c.Request.Context())
+		span := tx.StartSpan("Default span", "handler_main", nil)
+		span.End()
+		c.JSON(http.StatusOK, gin.H{"message": "Welcome to API!"})
+	})
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	r.Run(":8080")
+}
+
+func startPrometheus() {
+	log.Println("Prometheus metrics on /metrics port 2112")
+	http.Handle("/metrics", promhttp.Handler())
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		res := "{ \"status\": \"ok\" }"
+		w.Write([]byte(res))
+	})
+	http.ListenAndServe(":2112", nil)
 }

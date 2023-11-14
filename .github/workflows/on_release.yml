@@ -1,0 +1,36 @@
+name: Release tag
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  create-artifact:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.21.1' # The Go version to download (if necessary) and use
+
+      - uses: actions/checkout@v4
+      
+      - name: Get tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+
+      - name: Get repository name
+        run: echo "REPO_NAME=$(cut -d'/' -f2 <<< "${GITHUB_REPOSITORY}")" >> $GITHUB_ENV
+
+      - name: print
+        run: echo TAG=${{steps.tag.outputs.tag}} ImageName=${REPO_NAME}
+
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+        
+      - name: Build and Push
+        run: TAG=${{steps.tag.outputs.tag}} IMAGE_NAME=$REPO_NAME make push-image

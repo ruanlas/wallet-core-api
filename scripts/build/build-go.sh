@@ -1,0 +1,1 @@
+CGO_ENABLE=0 go build -o ./build/app/bin ./cmd/main.go

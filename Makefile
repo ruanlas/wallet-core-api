@@ -1,13 +1,19 @@
 help:
-	@echo "-------------------------------------------------------------------------------------"
-	@echo "-------------------------------- COMANDOS DO PROJETO --------------------------------"
-	@echo "-------------------------------------------------------------------------------------"
-	@echo "- Ambiente de desenvolvimento -------------------------------------------------------"
+	@echo "-------------------------------------------------------------------------------------------"
+	@echo "----------------------------------- COMANDOS DO PROJETO -----------------------------------"
+	@echo "-------------------------------------------------------------------------------------------"
+	@echo "- Ambiente de desenvolvimento -------------------------------------------------------------"
 	@echo "# make dev-start       =====>> inicia o ambiente de desenvolvimento"
 	@echo "# make dev-stop        =====>> interrompe o ambiente de desenvolvimento"
 	@echo "# make dev-init-load   =====>> carrega as informações iniciais no banco de dados"
 	@echo "# make dev-drop-tables =====>> remove todos os registros do banco de dados"
-	@echo "-------------------------------------------------------------------------------------"
+	@echo "-------------------------------------------------------------------------------------------"
+	@echo "- Comandos da aplicação -------------------------------------------------------------------"
+	@echo "# make test            =====>> Executa os testes unitários do projeto"
+	@echo "# make build-go-app    =====>> Faz o build da aplicação e gera o binário em ./build/app/"
+	@echo "# make build-image     =====>> Gera a imagem docker do projeto"
+	@echo "# make push-image      =====>> Envia a imagem docker para o repositório de imagens"
+	@echo "-------------------------------------------------------------------------------------------"
 
 dev-start:
 	docker compose -f build/dev/docker-compose.yml up -d
@@ -20,3 +26,26 @@ dev-init-load:
 
 dev-drop-tables:
 	docker exec -i wallet-db sh -c 'exec mysql -uroot -p123456 --default-character-set=utf8mb4 wallet_core < /docker-entrypoint-initdb.d/database_drop_tables.sql'
+
+test:
+	mkdir -p ./build/test-result
+	go test -short -coverprofile=build/test-result/cov.out `go list ./... | grep -v vendor`
+
+build-go-app:
+	$(MAKE) -C ./scripts/build/ build
+
+build-image: build-go-app
+ifndef IMAGE_NAME
+	$(error IMAGE_NAME is not set)
+endif
+ifndef TAG
+	$(error TAG is not set)
+endif
+	@echo "docker build . -t ruanlas/$(IMAGE_NAME):$(TAG)"
+
+push-image: build-image
+	@echo "docker push ruanlas/$(IMAGE_NAME):$(TAG)"
+
+doc-generate:
+	docker run --rm -it -v "$(PWD):/work" ruanlas/go-swagger-generator:v0.1.0 swag init -g cmd/main.go
+	docker run --rm -it -v "$(PWD):/work" ruanlas/swagger-to-markdown-convert:v0.1.0 swagger-markdown -i ./docs/swagger.yaml -o ./api_doc.md
