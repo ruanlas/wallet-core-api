@@ -90,11 +90,11 @@ services:
       retries: 20
       test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:5601/api/status
 
-  keycloack-db:
+  keycloak-db:
     image: mysql:8.2.0
-    container_name: keycloack-db
+    container_name: keycloak-db
     volumes:
-      - keycloack_data:/var/lib/mysql
+      - keycloak_data:/var/lib/mysql
     networks:
     - wallet-network
     environment:
@@ -110,7 +110,7 @@ services:
     - wallet-network
     environment:
       DB_VENDOR: MYSQL
-      DB_ADDR: keycloack-db
+      DB_ADDR: keycloak-db
       DB_DATABASE: keycloak
       DB_USER: keycloak
       DB_PASSWORD: password
@@ -122,12 +122,12 @@ services:
       - 8081:8080
     command: start-dev
     depends_on:
-      - keycloack-db
+      - keycloak-db
   
 volumes:
   esdata:
     driver: local
-  keycloack_data:
+  keycloak_data:
     driver: local
 
 networks:
