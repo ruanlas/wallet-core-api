@@ -1,4 +1,4 @@
-![Badge](https://img.shields.io/static/v1?label=Go&message=1.21.3&color=00ADD8&style=flat&logo=Go) ![Badge](https://img.shields.io/static/v1?label=MySQL&message=8.2.0&color=4479A1&style=flat&logo=MySQL) [![Github tag](https://badgen.net/github/tag/Naereen/Strapdown.js)](https://github.com/ruanlas/wallet-core-api/tags/)
+[![made-with-Go](https://img.shields.io/badge/Made%20with-Go-1f425f.svg)](https://go.dev/) ![Badge](https://img.shields.io/static/v1?label=Go&message=1.21.3&color=00ADD8&style=flat&logo=Go) ![Badge](https://img.shields.io/static/v1?label=MySQL&message=8.2.0&color=4479A1&style=flat&logo=MySQL) [![Github tag](https://badgen.net/github/tag/Naereen/Strapdown.js)](https://github.com/ruanlas/wallet-core-api/tags/)
 
 # wallet-core-api
 
