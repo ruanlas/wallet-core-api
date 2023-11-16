@@ -4,6 +4,8 @@
 
 O objetivo deste projeto é oferecer recursos para a gestão financeira pessoal.
 
+Ele permitirá lançar projeções de receitas e gastos, além de permitir lançar também os gastos e receitas efetivadas.
+
 ## Índice
 <!--ts-->
    * [Tecnologias utilizadas neste projeto](#tecnologias-utilizadas-neste-projeto)
