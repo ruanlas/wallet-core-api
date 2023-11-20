@@ -39,6 +39,7 @@ func (sp *storageProcess) Create(request CreateRequest) (*GainProjectionResponse
 	}
 
 	if request.Recurrence > 1 {
+		// Isolar em um método recurrenceProcess
 		for i := 1; i < int(request.Recurrence+1); i++ {
 			gainProjection := NewGainProjectionBuilder().
 				AddId(sp.generateUUID().String()).

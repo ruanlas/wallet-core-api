@@ -11,8 +11,8 @@ type repository struct {
 	db *sql.DB
 }
 
-func NewRepository() Repository {
-	return &repository{}
+func NewRepository(db *sql.DB) Repository {
+	return &repository{db: db}
 }
 
 func (r *repository) Save(gainProjection GainProjection) (*GainProjection, error) {

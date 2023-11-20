@@ -1,17 +1,23 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 
-	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	swaggerfiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
-	"go.elastic.co/apm"
+	"github.com/ruanlas/wallet-core-api/internal/routes"
+	v1 "github.com/ruanlas/wallet-core-api/internal/v1"
+	"github.com/ruanlas/wallet-core-api/internal/v1/gainprojection"
+	"go.elastic.co/apm/module/apmsql"
+	_ "go.elastic.co/apm/module/apmsql/mysql"
+)
+
+var (
+	db *sql.DB
 )
 
 func init() {
@@ -20,6 +26,17 @@ func init() {
 		godotenv.Load()
 	}
 	log.Println("ELASTIC_APM_SERVICE_NAME:", os.Getenv("ELASTIC_APM_SERVICE_NAME"))
+
+	// db, err := sql.Open("mysql", "root:123456@tcp(localhost:3306)/wallet_core?charset=utf8&parseTime=True&loc=Local")
+	db, err := apmsql.Open("mysql", "root:123456@tcp(localhost:3306)/wallet_core?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		panic(err)
+	}
+	err = db.Ping()
+	if err != nil {
+		db.Close()
+		panic(err)
+	}
 	go startPrometheus()
 }
 
@@ -31,19 +48,27 @@ func init() {
 func main() {
 	fmt.Println("Project Started!")
 
-	r := gin.Default()
+	gainProjectionRepository := gainprojection.NewRepository(db)
+	gainProjectionStorageProcess := gainprojection.NewStorageProcess(gainProjectionRepository)
+	gainProjectionHandler := gainprojection.NewHandler(gainProjectionStorageProcess)
 
-	// docs.SwaggerInfo.BasePath = "/api"
-	r.GET("/", func(c *gin.Context) {
+	apiV1 := v1.NewApi(gainProjectionHandler)
+	router := routes.NewRouter(apiV1)
+	router.SetupRoutes()
 
-		tx := apm.TransactionFromContext(c.Request.Context())
-		span := tx.StartSpan("Default span", "handler_main", nil)
-		span.End()
-		c.JSON(http.StatusOK, gin.H{"message": "Welcome to API!"})
-	})
+	// r := gin.Default()
 
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	r.Run(":8080")
+	// // docs.SwaggerInfo.BasePath = "/api"
+	// r.GET("/", func(c *gin.Context) {
+
+	// 	tx := apm.TransactionFromContext(c.Request.Context())
+	// 	span := tx.StartSpan("Default span", "handler_main", nil)
+	// 	span.End()
+	// 	c.JSON(http.StatusOK, gin.H{"message": "Welcome to API!"})
+	// })
+
+	// r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	// r.Run(":8080")
 }
 
 func startPrometheus() {
