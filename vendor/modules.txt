@@ -97,6 +97,9 @@ github.com/go-playground/universal-translator
 # github.com/go-playground/validator/v10 v10.14.0
 ## explicit; go 1.18
 github.com/go-playground/validator/v10
+# github.com/go-sql-driver/mysql v1.5.0
+## explicit; go 1.10
+github.com/go-sql-driver/mysql
 # github.com/goccy/go-json v0.10.2
 ## explicit; go 1.12
 github.com/goccy/go-json
@@ -184,6 +187,9 @@ github.com/santhosh-tekuri/jsonschema/decoders
 github.com/santhosh-tekuri/jsonschema/formats
 github.com/santhosh-tekuri/jsonschema/loader
 github.com/santhosh-tekuri/jsonschema/mediatypes
+# github.com/satori/go.uuid v1.2.0
+## explicit
+github.com/satori/go.uuid
 # github.com/swaggo/files v1.0.1
 ## explicit; go 1.16
 github.com/swaggo/files
@@ -232,10 +238,16 @@ go.elastic.co/apm/internal/configutil
 go.elastic.co/apm/internal/iochan
 go.elastic.co/apm/internal/pkgerrorsutil
 go.elastic.co/apm/internal/ringbuffer
+go.elastic.co/apm/internal/sqlscanner
+go.elastic.co/apm/internal/sqlutil
 go.elastic.co/apm/internal/wildcard
 go.elastic.co/apm/model
 go.elastic.co/apm/stacktrace
 go.elastic.co/apm/transport
+# go.elastic.co/apm/module/apmsql v1.15.0
+## explicit; go 1.13
+go.elastic.co/apm/module/apmsql
+go.elastic.co/apm/module/apmsql/mysql
 # go.elastic.co/fastjson v1.3.0
 ## explicit; go 1.19
 go.elastic.co/fastjson
