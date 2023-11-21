@@ -25,7 +25,7 @@ func (h *handler) Create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "message": err.Error()})
 		return
 	}
-	gainCreated, err := h.storageProcess.Create(request)
+	gainCreated, err := h.storageProcess.Create(c.Request.Context(), request)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": http.StatusInternalServerError, "message": err.Error()})
 		return

@@ -12,6 +12,7 @@ import (
 	"github.com/ruanlas/wallet-core-api/internal/routes"
 	v1 "github.com/ruanlas/wallet-core-api/internal/v1"
 	"github.com/ruanlas/wallet-core-api/internal/v1/gainprojection"
+	uuid "github.com/satori/go.uuid"
 	"go.elastic.co/apm/module/apmsql"
 	_ "go.elastic.co/apm/module/apmsql/mysql"
 )
@@ -27,8 +28,9 @@ func init() {
 	}
 	log.Println("ELASTIC_APM_SERVICE_NAME:", os.Getenv("ELASTIC_APM_SERVICE_NAME"))
 
-	// db, err := sql.Open("mysql", "root:123456@tcp(localhost:3306)/wallet_core?charset=utf8&parseTime=True&loc=Local")
-	db, err := apmsql.Open("mysql", "root:123456@tcp(localhost:3306)/wallet_core?charset=utf8&parseTime=True&loc=Local")
+	var err error
+	// db, err = sql.Open("mysql", "root:123456@tcp(localhost:3306)/wallet_core?charset=utf8&parseTime=True&loc=Local")
+	db, err = apmsql.Open("mysql", "root:123456@tcp(localhost:3306)/wallet_core?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		panic(err)
 	}
@@ -49,7 +51,7 @@ func main() {
 	fmt.Println("Project Started!")
 
 	gainProjectionRepository := gainprojection.NewRepository(db)
-	gainProjectionStorageProcess := gainprojection.NewStorageProcess(gainProjectionRepository)
+	gainProjectionStorageProcess := gainprojection.NewStorageProcess(gainProjectionRepository, uuid.NewV4)
 	gainProjectionHandler := gainprojection.NewHandler(gainProjectionStorageProcess)
 
 	apiV1 := v1.NewApi(gainProjectionHandler)

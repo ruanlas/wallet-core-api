@@ -1,13 +1,14 @@
 package gainprojection
 
 import (
+	"context"
 	"time"
 
 	uuid "github.com/satori/go.uuid"
 )
 
 type StorageProcess interface {
-	Create(request CreateRequest) (*GainProjectionResponse, error)
+	Create(ctx context.Context, request CreateRequest) (*GainProjectionResponse, error)
 }
 
 type storageProcess struct {
@@ -15,11 +16,11 @@ type storageProcess struct {
 	generateUUID func() uuid.UUID
 }
 
-func NewStorageProcess(repository Repository) StorageProcess {
-	return &storageProcess{repository: repository}
+func NewStorageProcess(repository Repository, generateUUID func() uuid.UUID) StorageProcess {
+	return &storageProcess{repository: repository, generateUUID: generateUUID}
 }
 
-func (sp *storageProcess) Create(request CreateRequest) (*GainProjectionResponse, error) {
+func (sp *storageProcess) Create(ctx context.Context, request CreateRequest) (*GainProjectionResponse, error) {
 	createdAt := time.Now()
 	gainProjection := NewGainProjectionBuilder().
 		AddId(sp.generateUUID().String()).
@@ -33,7 +34,7 @@ func (sp *storageProcess) Create(request CreateRequest) (*GainProjectionResponse
 		AddUserId("User1").
 		Build()
 
-	gainProjectionSaved, err := sp.repository.Save(*gainProjection)
+	gainProjectionSaved, err := sp.repository.Save(ctx, *gainProjection)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +54,7 @@ func (sp *storageProcess) Create(request CreateRequest) (*GainProjectionResponse
 				AddUserId("User1").
 				Build()
 
-			_, err = sp.repository.Save(*gainProjection)
+			_, err = sp.repository.Save(ctx, *gainProjection)
 			if err != nil {
 				return nil, err
 			}
@@ -61,7 +62,7 @@ func (sp *storageProcess) Create(request CreateRequest) (*GainProjectionResponse
 	} else {
 		request.Recurrence = 1
 	}
-	gainProjectionSaved, err = sp.repository.GetById(gainProjectionSaved.Id)
+	gainProjectionSaved, err = sp.repository.GetById(ctx, gainProjectionSaved.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +73,7 @@ func (sp *storageProcess) Create(request CreateRequest) (*GainProjectionResponse
 		AddDescription(gainProjection.Description).
 		AddValue(gainProjection.Value).
 		AddIsPassive(gainProjection.IsPassive).
-		AddCategory(CategoryResponse{Id: gainProjection.Category.Id, Category: gainProjection.Category.Category}).
+		AddCategory(CategoryResponse{Id: gainProjectionSaved.Category.Id, Category: gainProjectionSaved.Category.Category}).
 		AddRecurrence(request.Recurrence).
 		Build(), nil
 }
