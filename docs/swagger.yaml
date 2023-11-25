@@ -1,0 +1,81 @@
+basePath: /api/
+definitions:
+  service.CategoryResponse:
+    properties:
+      category:
+        type: string
+      id:
+        type: integer
+    type: object
+  service.CreateRequest:
+    properties:
+      category_id:
+        type: integer
+      description:
+        type: string
+      is_passive:
+        type: boolean
+      pay_in:
+        type: string
+      recurrence:
+        type: integer
+      value:
+        type: number
+    type: object
+  service.GainProjectionResponse:
+    properties:
+      category:
+        $ref: '#/definitions/service.CategoryResponse'
+      description:
+        type: string
+      id:
+        type: string
+      is_passive:
+        type: boolean
+      pay_in:
+        type: string
+      recurrence:
+        type: integer
+      value:
+        type: number
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API que dispões de recursos para gerenciar as finanças pessoais
+  title: Wallet Core
+  version: 0.1.0
+paths:
+  /v1/gain-projection:
+    post:
+      consumes:
+      - application/json
+      description: Este endpoint permite criar uma receita prevista
+      parameters:
+      - description: Modelo de criação da receita
+        in: body
+        name: gain_projection
+        required: true
+        schema:
+          $ref: '#/definitions/service.CreateRequest'
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      - description: Informações do usuário em base64
+        in: header
+        name: X-Userinfo
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/service.GainProjectionResponse'
+      summary: Criar uma Receita Prevista
+      tags:
+      - Gain-Projection
+swagger: "2.0"
