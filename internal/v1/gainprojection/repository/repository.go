@@ -1,4 +1,4 @@
-package gainprojection
+package repository
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 )
 
 type Repository interface {
-	Save(ctx context.Context, gainProjections GainProjection) (*GainProjection, error)
+	Save(ctx context.Context, gainProjection GainProjection) (*GainProjection, error)
 	GetById(ctx context.Context, id string) (*GainProjection, error)
 }
 
@@ -15,7 +15,7 @@ type repository struct {
 	db *sql.DB
 }
 
-func NewRepository(db *sql.DB) Repository {
+func New(db *sql.DB) Repository {
 	return &repository{db: db}
 }
 

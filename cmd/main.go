@@ -12,6 +12,8 @@ import (
 	"github.com/ruanlas/wallet-core-api/internal/routes"
 	v1 "github.com/ruanlas/wallet-core-api/internal/v1"
 	"github.com/ruanlas/wallet-core-api/internal/v1/gainprojection"
+	gainprojectionrepository "github.com/ruanlas/wallet-core-api/internal/v1/gainprojection/repository"
+	gainprojectionservice "github.com/ruanlas/wallet-core-api/internal/v1/gainprojection/service"
 	uuid "github.com/satori/go.uuid"
 	"go.elastic.co/apm/module/apmsql"
 	_ "go.elastic.co/apm/module/apmsql/mysql"
@@ -50,8 +52,8 @@ func init() {
 func main() {
 	fmt.Println("Project Started!")
 
-	gainProjectionRepository := gainprojection.NewRepository(db)
-	gainProjectionStorageProcess := gainprojection.NewStorageProcess(gainProjectionRepository, uuid.NewV4)
+	gainProjectionRepository := gainprojectionrepository.New(db)
+	gainProjectionStorageProcess := gainprojectionservice.NewStorageProcess(gainProjectionRepository, uuid.NewV4)
 	gainProjectionHandler := gainprojection.NewHandler(gainProjectionStorageProcess)
 
 	apiV1 := v1.NewApi(gainProjectionHandler)

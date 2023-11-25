@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ruanlas/wallet-core-api/internal/v1/gainprojection/service"
 )
 
 type Handler interface {
@@ -11,15 +12,15 @@ type Handler interface {
 }
 
 type handler struct {
-	storageProcess StorageProcess
+	storageProcess service.StorageProcess
 }
 
-func NewHandler(storageProcess StorageProcess) Handler {
+func NewHandler(storageProcess service.StorageProcess) Handler {
 	return &handler{storageProcess: storageProcess}
 }
 
 func (h *handler) Create(c *gin.Context) {
-	var request CreateRequest
+	var request service.CreateRequest
 	err := c.ShouldBindJSON(&request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "message": err.Error()})

@@ -1,9 +1,10 @@
-package gainprojection
+package service
 
 import (
 	"context"
 	"time"
 
+	"github.com/ruanlas/wallet-core-api/internal/v1/gainprojection/repository"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -12,23 +13,23 @@ type StorageProcess interface {
 }
 
 type storageProcess struct {
-	repository   Repository
+	repository   repository.Repository
 	generateUUID func() uuid.UUID
 }
 
-func NewStorageProcess(repository Repository, generateUUID func() uuid.UUID) StorageProcess {
+func NewStorageProcess(repository repository.Repository, generateUUID func() uuid.UUID) StorageProcess {
 	return &storageProcess{repository: repository, generateUUID: generateUUID}
 }
 
 func (sp *storageProcess) Create(ctx context.Context, request CreateRequest) (*GainProjectionResponse, error) {
 	createdAt := time.Now()
-	gainProjection := NewGainProjectionBuilder().
+	gainProjection := repository.NewGainProjectionBuilder().
 		AddId(sp.generateUUID().String()).
 		AddCreatedAt(createdAt).
 		AddPayIn(request.PayIn).
 		AddIsPassive(request.IsPassive).
 		AddIsDone(false).
-		AddCategory(GainCategory{Id: request.CategoryId}).
+		AddCategory(repository.GainCategory{Id: request.CategoryId}).
 		AddDescription(request.Description).
 		AddValue(request.Value).
 		AddUserId("User1").
@@ -42,13 +43,13 @@ func (sp *storageProcess) Create(ctx context.Context, request CreateRequest) (*G
 	if request.Recurrence > 1 {
 		// Isolar em um método recurrenceProcess
 		for i := 1; i < int(request.Recurrence+1); i++ {
-			gainProjection := NewGainProjectionBuilder().
+			gainProjection := repository.NewGainProjectionBuilder().
 				AddId(sp.generateUUID().String()).
 				AddCreatedAt(createdAt).
 				AddPayIn(request.PayIn.AddDate(0, i, 0)).
 				AddIsPassive(request.IsPassive).
 				AddIsDone(false).
-				AddCategory(GainCategory{Id: request.CategoryId}).
+				AddCategory(repository.GainCategory{Id: request.CategoryId}).
 				AddDescription(request.Description).
 				AddValue(request.Value).
 				AddUserId("User1").

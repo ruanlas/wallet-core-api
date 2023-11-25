@@ -1,6 +1,8 @@
 package v1
 
-import "github.com/ruanlas/wallet-core-api/internal/v1/gainprojection"
+import (
+	"github.com/ruanlas/wallet-core-api/internal/v1/gainprojection"
+)
 
 type Api interface {
 	GetGainProjectionHandler() gainprojection.Handler

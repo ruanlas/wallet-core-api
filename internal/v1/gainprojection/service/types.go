@@ -1,4 +1,4 @@
-package gainprojection
+package service
 
 import "time"
 
@@ -32,21 +32,4 @@ type GainProjectionResponse struct {
 type CategoryResponse struct {
 	Id       uint   `json:"id"`
 	Category string `json:"category"`
-}
-
-type GainProjection struct {
-	Id          string
-	CreatedAt   time.Time
-	PayIn       time.Time
-	Description string
-	Value       float64
-	IsPassive   bool
-	IsDone      bool
-	UserId      string
-	Category    GainCategory
-}
-
-type GainCategory struct {
-	Id       uint
-	Category string
 }
