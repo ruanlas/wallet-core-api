@@ -41,24 +41,9 @@ func (sp *storageProcess) Create(ctx context.Context, request CreateRequest) (*G
 	}
 
 	if request.Recurrence > 1 {
-		// Isolar em um método recurrenceProcess
-		for i := 1; i < int(request.Recurrence+1); i++ {
-			gainProjection := repository.NewGainProjectionBuilder().
-				AddId(sp.generateUUID().String()).
-				AddCreatedAt(createdAt).
-				AddPayIn(request.PayIn.AddDate(0, i, 0)).
-				AddIsPassive(request.IsPassive).
-				AddIsDone(false).
-				AddCategory(repository.GainCategory{Id: request.CategoryId}).
-				AddDescription(request.Description).
-				AddValue(request.Value).
-				AddUserId("User1").
-				Build()
-
-			_, err = sp.repository.Save(ctx, *gainProjection)
-			if err != nil {
-				return nil, err
-			}
+		err = sp.createRecurrence(ctx, request, createdAt)
+		if err != nil {
+			return nil, err
 		}
 	} else {
 		request.Recurrence = 1
@@ -77,4 +62,26 @@ func (sp *storageProcess) Create(ctx context.Context, request CreateRequest) (*G
 		AddCategory(CategoryResponse{Id: gainProjectionSaved.Category.Id, Category: gainProjectionSaved.Category.Category}).
 		AddRecurrence(request.Recurrence).
 		Build(), nil
+}
+
+func (sp *storageProcess) createRecurrence(ctx context.Context, request CreateRequest, createdAt time.Time) error {
+	for i := 1; i < int(request.Recurrence+1); i++ {
+		gainProjection := repository.NewGainProjectionBuilder().
+			AddId(sp.generateUUID().String()).
+			AddCreatedAt(createdAt).
+			AddPayIn(request.PayIn.AddDate(0, i, 0)).
+			AddIsPassive(request.IsPassive).
+			AddIsDone(false).
+			AddCategory(repository.GainCategory{Id: request.CategoryId}).
+			AddDescription(request.Description).
+			AddValue(request.Value).
+			AddUserId("User1").
+			Build()
+
+		_, err := sp.repository.Save(ctx, *gainProjection)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
