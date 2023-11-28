@@ -32,9 +32,18 @@ func NewHandler(storageProcess service.StorageProcess) Handler {
 // @Router /v1/gain-projection [post]
 func (h *handler) Create(c *gin.Context) {
 	var request service.CreateRequest
+	// ctx := c.Request.Context()
+	// tx := apm.TransactionFromContext(ctx)
+	// apm.TransactionFromContext(ctx)
+
 	err := c.ShouldBindJSON(&request)
+	// span := tx.StartSpan("GainProjection::Handler::ValidateBody", "Validate ", nil)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "message": err.Error()})
+		// apmErr := apm.DefaultTracer.NewError(err)
+		// apmErr.SetSpan(span)
+		// apmErr.Send()
+		// span.End()
 		return
 	}
 	gainCreated, err := h.storageProcess.Create(c.Request.Context(), request)
@@ -42,5 +51,6 @@ func (h *handler) Create(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": http.StatusInternalServerError, "message": err.Error()})
 		return
 	}
+	// span.End()
 	c.JSON(http.StatusCreated, gainCreated)
 }

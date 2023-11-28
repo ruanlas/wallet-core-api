@@ -28,7 +28,6 @@ func init() {
 	if env == "" {
 		godotenv.Load()
 	}
-	log.Println("ELASTIC_APM_SERVICE_NAME:", os.Getenv("ELASTIC_APM_SERVICE_NAME"))
 
 	var err error
 	// db, err = sql.Open("mysql", "root:123456@tcp(localhost:3306)/wallet_core?charset=utf8&parseTime=True&loc=Local")
@@ -59,20 +58,6 @@ func main() {
 	apiV1 := v1.NewApi(gainProjectionHandler)
 	router := routes.NewRouter(apiV1)
 	router.SetupRoutes()
-
-	// r := gin.Default()
-
-	// // docs.SwaggerInfo.BasePath = "/api"
-	// r.GET("/", func(c *gin.Context) {
-
-	// 	tx := apm.TransactionFromContext(c.Request.Context())
-	// 	span := tx.StartSpan("Default span", "handler_main", nil)
-	// 	span.End()
-	// 	c.JSON(http.StatusOK, gin.H{"message": "Welcome to API!"})
-	// })
-
-	// r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	// r.Run(":8080")
 }
 
 func startPrometheus() {
