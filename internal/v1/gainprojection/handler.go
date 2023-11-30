@@ -4,7 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ruanlas/wallet-core-api/internal/tracing"
 	"github.com/ruanlas/wallet-core-api/internal/v1/gainprojection/service"
+	"go.elastic.co/apm"
 )
 
 type Handler interface {
@@ -32,25 +34,22 @@ func NewHandler(storageProcess service.StorageProcess) Handler {
 // @Router /v1/gain-projection [post]
 func (h *handler) Create(c *gin.Context) {
 	var request service.CreateRequest
-	// ctx := c.Request.Context()
-	// tx := apm.TransactionFromContext(ctx)
+	ctx := c.Request.Context()
+	tx := apm.TransactionFromContext(ctx)
 	// apm.TransactionFromContext(ctx)
 
 	err := c.ShouldBindJSON(&request)
-	// span := tx.StartSpan("GainProjection::Handler::ValidateBody", "Validate ", nil)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "message": err.Error()})
-		// apmErr := apm.DefaultTracer.NewError(err)
-		// apmErr.SetSpan(span)
-		// apmErr.Send()
-		// span.End()
 		return
 	}
+	span := tx.StartSpan("GainProjection::StorageProcess::Create", "Create new gain-projection", nil)
 	gainCreated, err := h.storageProcess.Create(c.Request.Context(), request)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": http.StatusInternalServerError, "message": err.Error()})
+		tracing.SendSpanErr(span, err)
 		return
 	}
-	// span.End()
+	span.End()
 	c.JSON(http.StatusCreated, gainCreated)
 }
