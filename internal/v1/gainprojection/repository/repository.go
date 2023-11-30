@@ -1,26 +1,31 @@
-package gainprojection
+package repository
 
-import "database/sql"
+import (
+	"context"
+	"database/sql"
+	"time"
+)
 
 type Repository interface {
-	Save(gainProjection GainProjection) (*GainProjection, error)
-	GetById(id string) (*GainProjection, error)
+	Save(ctx context.Context, gainProjection GainProjection) (*GainProjection, error)
+	GetById(ctx context.Context, id string) (*GainProjection, error)
 }
 
 type repository struct {
 	db *sql.DB
 }
 
-func NewRepository(db *sql.DB) Repository {
+func New(db *sql.DB) Repository {
 	return &repository{db: db}
 }
 
-func (r *repository) Save(gainProjection GainProjection) (*GainProjection, error) {
-	tx, err := r.db.Begin()
+func (r *repository) Save(ctx context.Context, gainProjection GainProjection) (*GainProjection, error) {
+	// tx, err := r.db.Begin()
+	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
-	stmt, err := tx.Prepare(`
+	stmt, err := tx.PrepareContext(ctx, `
 		INSERT INTO gain_projection (id, created_at, pay_in, description, value, is_passive, is_done, user_id, category_id) 
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
@@ -29,7 +34,7 @@ func (r *repository) Save(gainProjection GainProjection) (*GainProjection, error
 	defer stmt.Close()
 	_, err = stmt.Exec(
 		gainProjection.Id,
-		gainProjection.CreatedAt,
+		gainProjection.CreatedAt.Unix(),
 		gainProjection.PayIn,
 		gainProjection.Description,
 		gainProjection.Value,
@@ -48,8 +53,8 @@ func (r *repository) Save(gainProjection GainProjection) (*GainProjection, error
 	return &gainProjection, nil
 }
 
-func (r *repository) GetById(id string) (*GainProjection, error) {
-	results, err := r.db.Query(`
+func (r *repository) GetById(ctx context.Context, id string) (*GainProjection, error) {
+	results, err := r.db.QueryContext(ctx, `
 		SELECT
 			gp.id,
 			gp.created_at,
@@ -74,9 +79,10 @@ func (r *repository) GetById(id string) (*GainProjection, error) {
 	if results.Next() {
 		var value sql.NullFloat64
 		var categoryId sql.NullInt64
+		var createdAtTimestamp sql.NullInt64
 		err := results.Scan(
 			&gainProjection.Id,
-			&gainProjection.CreatedAt,
+			&createdAtTimestamp,
 			&gainProjection.PayIn,
 			&gainProjection.Description,
 			&value,
@@ -89,6 +95,7 @@ func (r *repository) GetById(id string) (*GainProjection, error) {
 		if err != nil {
 			return nil, err
 		}
+		gainProjection.CreatedAt = time.Unix(createdAtTimestamp.Int64, 0)
 		gainProjection.Category.Id = uint(categoryId.Int64)
 		gainProjection.Value = value.Float64
 	} else {
