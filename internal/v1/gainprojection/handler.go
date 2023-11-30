@@ -11,6 +11,7 @@ import (
 
 type Handler interface {
 	Create(c *gin.Context)
+	GetById(c *gin.Context)
 }
 
 type handler struct {
@@ -52,4 +53,7 @@ func (h *handler) Create(c *gin.Context) {
 	}
 	span.End()
 	c.JSON(http.StatusCreated, gainCreated)
+}
+
+func (h *handler) GetById(c *gin.Context) {
 }
