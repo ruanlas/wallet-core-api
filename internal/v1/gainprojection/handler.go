@@ -11,14 +11,16 @@ import (
 
 type Handler interface {
 	Create(c *gin.Context)
+	GetById(c *gin.Context)
 }
 
 type handler struct {
 	storageProcess service.StorageProcess
+	readingProcess service.ReadingProcess
 }
 
-func NewHandler(storageProcess service.StorageProcess) Handler {
-	return &handler{storageProcess: storageProcess}
+func NewHandler(storageProcess service.StorageProcess, readingProcess service.ReadingProcess) Handler {
+	return &handler{storageProcess: storageProcess, readingProcess: readingProcess}
 }
 
 // Create godoc
@@ -52,4 +54,35 @@ func (h *handler) Create(c *gin.Context) {
 	}
 	span.End()
 	c.JSON(http.StatusCreated, gainCreated)
+}
+
+// @Summary Obter uma Receita Prevista
+// @Description Este endpoint permite obter uma receita prevista
+// @Tags Gain-Projection
+// @Accept json
+// @Produce json
+// @Param id path string true "Id da receita prevista"
+// @Param   X-Access-Token	header	string	true	"Token de autenticação do usuário"
+// @Param   X-Userinfo	header	string	true	"Informações do usuário em base64"
+// @Success 200 {object} service.GainProjectionResponse
+// @Router /v1/gain-projection/{id} [get]
+func (h *handler) GetById(c *gin.Context) {
+	ctx := c.Request.Context()
+	tx := apm.TransactionFromContext(ctx)
+
+	id := c.Param("id")
+
+	span := tx.StartSpan("GainProjection::ReadingProcess::GetById", "Get a gain-projection by id", nil)
+	gainProjection, err := h.readingProcess.GetById(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"status": http.StatusInternalServerError, "message": err.Error()})
+		tracing.SendSpanErr(span, err)
+		return
+	}
+	if gainProjection == nil {
+		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "message": "Object not found"})
+		return
+	}
+	span.End()
+	c.JSON(http.StatusOK, gainProjection)
 }

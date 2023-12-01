@@ -14,23 +14,35 @@ import (
 )
 
 type storageProcessMock struct {
-	err error
-	*service.GainProjectionResponse
+	err      error
+	response *service.GainProjectionResponse
 }
 
 func (sp *storageProcessMock) Create(ctx context.Context, request service.CreateRequest) (*service.GainProjectionResponse, error) {
 	if sp.err != nil {
 		return nil, sp.err
 	}
-	return sp.GainProjectionResponse, nil
+	return sp.response, nil
+}
+
+type readingProcessMock struct {
+	err      error
+	response *service.GainProjectionResponse
+}
+
+func (rp *readingProcessMock) GetById(ctx context.Context, gainProjectionId string) (*service.GainProjectionResponse, error) {
+	if rp.err != nil {
+		return nil, rp.err
+	}
+	return rp.response, nil
 }
 
 func TestCreateSuccess(t *testing.T) {
 	_storageProcessMock := &storageProcessMock{
-		GainProjectionResponse: &service.GainProjectionResponse{},
+		response: &service.GainProjectionResponse{},
 	}
 
-	handler := NewHandler(_storageProcessMock)
+	handler := NewHandler(_storageProcessMock, nil)
 	w := httptest.NewRecorder()
 	router := gin.Default()
 	apiRouter := router.Group("/v1")
@@ -55,10 +67,10 @@ func TestCreateSuccess(t *testing.T) {
 
 func TestCreateInvalidBody(t *testing.T) {
 	_storageProcessMock := &storageProcessMock{
-		GainProjectionResponse: &service.GainProjectionResponse{},
+		response: &service.GainProjectionResponse{},
 	}
 
-	handler := NewHandler(_storageProcessMock)
+	handler := NewHandler(_storageProcessMock, nil)
 	w := httptest.NewRecorder()
 	router := gin.Default()
 	apiRouter := router.Group("/v1")
@@ -86,7 +98,7 @@ func TestCreateError(t *testing.T) {
 		err: errors.New("An error has been ocurred"),
 	}
 
-	handler := NewHandler(_storageProcessMock)
+	handler := NewHandler(_storageProcessMock, nil)
 	w := httptest.NewRecorder()
 	router := gin.Default()
 	apiRouter := router.Group("/v1")
@@ -102,6 +114,61 @@ func TestCreateError(t *testing.T) {
 		"category_id": 2
 	}`)
 	req, _ := http.NewRequest("POST", "/v1/gain-projection", bytes.NewReader(body))
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"message":"An error has been ocurred","status":500}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+}
+
+func TestGetByIdSuccess(t *testing.T) {
+	_readingProcessMock := &readingProcessMock{
+		response: &service.GainProjectionResponse{Id: "9b15034f-85fe-4476-82b1-a95f438aadd5"},
+	}
+
+	handler := NewHandler(nil, _readingProcessMock)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.GET("/gain-projection/:id", handler.GetById)
+
+	req, _ := http.NewRequest("GET", "/v1/gain-projection/9b15034f-85fe-4476-82b1-a95f438aadd5", nil)
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"id":"9b15034f-85fe-4476-82b1-a95f438aadd5","pay_in":"0001-01-01T00:00:00Z","description":"","value":0,"is_passive":false,"category":{"id":0,"category":""}}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestGetByIdNotFound(t *testing.T) {
+	_readingProcessMock := &readingProcessMock{}
+
+	handler := NewHandler(nil, _readingProcessMock)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.GET("/gain-projection/:id", handler.GetById)
+
+	req, _ := http.NewRequest("GET", "/v1/gain-projection/9b15034f-85fe-4476-82b1-a95f438aadd5", nil)
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"message":"Object not found","status":404}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusNotFound, w.Code)
+}
+
+func TestGetByIdError(t *testing.T) {
+	_readingProcessMock := &readingProcessMock{
+		err: errors.New("An error has been ocurred"),
+	}
+
+	handler := NewHandler(nil, _readingProcessMock)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.GET("/gain-projection/:id", handler.GetById)
+
+	req, _ := http.NewRequest("GET", "/v1/gain-projection/9b15034f-85fe-4476-82b1-a95f438aadd5", nil)
 
 	router.ServeHTTP(w, req)
 	bodyExpected := `{"message":"An error has been ocurred","status":500}`

@@ -78,4 +78,35 @@ paths:
       summary: Criar uma Receita Prevista
       tags:
       - Gain-Projection
+  /v1/gain-projection/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Este endpoint permite obter uma receita prevista
+      parameters:
+      - description: Id da receita prevista
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      - description: Informações do usuário em base64
+        in: header
+        name: X-Userinfo
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.GainProjectionResponse'
+      summary: Obter uma Receita Prevista
+      tags:
+      - Gain-Projection
 swagger: "2.0"

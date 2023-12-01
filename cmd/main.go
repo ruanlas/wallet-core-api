@@ -53,7 +53,8 @@ func main() {
 
 	gainProjectionRepository := gainprojectionrepository.New(db)
 	gainProjectionStorageProcess := gainprojectionservice.NewStorageProcess(gainProjectionRepository, uuid.NewV4)
-	gainProjectionHandler := gainprojection.NewHandler(gainProjectionStorageProcess)
+	gainProjectionReadingProcess := gainprojectionservice.NewReadingProcess(gainProjectionRepository)
+	gainProjectionHandler := gainprojection.NewHandler(gainProjectionStorageProcess, gainProjectionReadingProcess)
 
 	apiV1 := v1.NewApi(gainProjectionHandler)
 	router := routes.NewRouter(apiV1)

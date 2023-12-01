@@ -29,6 +29,31 @@ Este endpoint permite criar uma receita prevista
 | ---- | ----------- | ------ |
 | 201 | Created | [service.GainProjectionResponse](#servicegainprojectionresponse) |
 
+### /v1/gain-projection/{id}
+
+#### GET
+##### Summary
+
+Obter uma Receita Prevista
+
+##### Description
+
+Este endpoint permite obter uma receita prevista
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| id | path | Id da receita prevista | Yes | string |
+| X-Access-Token | header | Token de autenticação do usuário | Yes | string |
+| X-Userinfo | header | Informações do usuário em base64 | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | OK | [service.GainProjectionResponse](#servicegainprojectionresponse) |
+
 ---
 ### Models
 
