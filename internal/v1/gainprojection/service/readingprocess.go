@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/ruanlas/wallet-core-api/internal/v1/gainprojection/repository"
-	uuid "github.com/satori/go.uuid"
 )
 
 type ReadingProcess interface {
@@ -12,8 +11,7 @@ type ReadingProcess interface {
 }
 
 type readingProcess struct {
-	repository   repository.Repository
-	generateUUID func() uuid.UUID
+	repository repository.Repository
 }
 
 func NewReadingProcess(repository repository.Repository) ReadingProcess {
@@ -24,6 +22,9 @@ func (rp *readingProcess) GetById(ctx context.Context, gainProjectionId string) 
 	gainProjection, err := rp.repository.GetById(ctx, gainProjectionId)
 	if err != nil {
 		return nil, err
+	}
+	if gainProjection == nil {
+		return nil, nil
 	}
 
 	return NewGainProjectionResponseBuilder().

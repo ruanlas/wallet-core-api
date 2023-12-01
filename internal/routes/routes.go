@@ -25,6 +25,7 @@ func (r *Router) SetupRoutes() {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	v1router := router.Group("/v1")
 	v1router.POST("/gain-projection", r.apiV1.GetGainProjectionHandler().Create)
+	v1router.GET("/gain-projection/:id", r.apiV1.GetGainProjectionHandler().GetById)
 
 	router.Run(":8080")
 }
