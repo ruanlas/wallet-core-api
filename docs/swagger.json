@@ -56,6 +56,52 @@
                     }
                 }
             }
+        },
+        "/v1/gain-projection/{id}": {
+            "get": {
+                "description": "Este endpoint permite obter uma receita prevista",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Gain-Projection"
+                ],
+                "summary": "Obter uma Receita Prevista",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id da receita prevista",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Informações do usuário em base64",
+                        "name": "X-Userinfo",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.GainProjectionResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
