@@ -11,7 +11,7 @@ type CreateRequest struct {
 	CategoryId  uint      `json:"category_id"`
 }
 
-type EditRequest struct {
+type UpdateRequest struct {
 	PayIn       time.Time `json:"pay_in"`
 	Description string    `json:"description"`
 	Value       float64   `json:"value"`

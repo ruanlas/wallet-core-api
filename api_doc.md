@@ -54,6 +54,29 @@ Este endpoint permite obter uma receita prevista
 | ---- | ----------- | ------ |
 | 200 | OK | [service.GainProjectionResponse](#servicegainprojectionresponse) |
 
+#### PUT
+##### Summary
+
+Editar uma Receita Prevista
+
+##### Description
+
+Este endpoint permite editar uma receita prevista
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| gain_projection | body | Modelo de edição da receita | Yes | [service.UpdateRequest](#serviceupdaterequest) |
+| X-Access-Token | header | Token de autenticação do usuário | Yes | string |
+| X-Userinfo | header | Informações do usuário em base64 | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | OK | [service.GainProjectionResponse](#servicegainprojectionresponse) |
+
 ---
 ### Models
 
@@ -85,4 +108,14 @@ Este endpoint permite obter uma receita prevista
 | is_passive | boolean |  | No |
 | pay_in | string |  | No |
 | recurrence | integer |  | No |
+| value | number |  | No |
+
+#### service.UpdateRequest
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| category_id | integer |  | No |
+| description | string |  | No |
+| is_passive | boolean |  | No |
+| pay_in | string |  | No |
 | value | number |  | No |
