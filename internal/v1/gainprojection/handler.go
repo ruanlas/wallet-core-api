@@ -12,6 +12,7 @@ import (
 type Handler interface {
 	Create(c *gin.Context)
 	GetById(c *gin.Context)
+	Update(c *gin.Context)
 }
 
 type handler struct {
@@ -85,4 +86,41 @@ func (h *handler) GetById(c *gin.Context) {
 	}
 	span.End()
 	c.JSON(http.StatusOK, gainProjection)
+}
+
+// Create godoc
+// @Summary Editar uma Receita Prevista
+// @Description Este endpoint permite editar uma receita prevista
+// @Tags Gain-Projection
+// @Accept json
+// @Produce json
+// @Param gain_projection body service.UpdateRequest true "Modelo de edição da receita"
+// @Param   X-Access-Token	header	string	true	"Token de autenticação do usuário"
+// @Param   X-Userinfo	header	string	true	"Informações do usuário em base64"
+// @Success 200 {object} service.GainProjectionResponse
+// @Router /v1/gain-projection/{id} [put]
+func (h *handler) Update(c *gin.Context) {
+	ctx := c.Request.Context()
+	tx := apm.TransactionFromContext(ctx)
+
+	id := c.Param("id")
+	var request service.UpdateRequest
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "message": err.Error()})
+		return
+	}
+	span := tx.StartSpan("GainProjection::StorageProcess::Update", "Create new gain-projection", nil)
+	gainUpdated, err := h.storageProcess.Update(c.Request.Context(), id, request)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"status": http.StatusInternalServerError, "message": err.Error()})
+		tracing.SendSpanErr(span, err)
+		return
+	}
+	if gainUpdated == nil {
+		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "message": "Gain projection not found"})
+		return
+	}
+	span.End()
+	c.JSON(http.StatusOK, gainUpdated)
 }

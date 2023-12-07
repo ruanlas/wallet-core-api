@@ -26,6 +26,7 @@ func (r *Router) SetupRoutes() {
 	v1router := router.Group("/v1")
 	v1router.POST("/gain-projection", r.apiV1.GetGainProjectionHandler().Create)
 	v1router.GET("/gain-projection/:id", r.apiV1.GetGainProjectionHandler().GetById)
+	v1router.PUT("/gain-projection/:id", r.apiV1.GetGainProjectionHandler().Update)
 
 	router.Run(":8080")
 }

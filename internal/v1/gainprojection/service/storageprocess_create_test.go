@@ -14,6 +14,7 @@ import (
 type mockRepository struct {
 	saveCallsMock   []func(ctx context.Context, gainProjection repository.GainProjection) (*repository.GainProjection, error)
 	getByIdCallMock []func(ctx context.Context, id string) (*repository.GainProjection, error)
+	editCallsMock   []func(ctx context.Context, gainProjection repository.GainProjection) (*repository.GainProjection, error)
 }
 
 func (r *mockRepository) AddSaveCall(
@@ -28,11 +29,26 @@ func (r *mockRepository) AddGetByIdCall(
 	return r
 }
 
+func (r *mockRepository) AddEditCall(
+	edit func(ctx context.Context, gainProjection repository.GainProjection) (*repository.GainProjection, error)) *mockRepository {
+	r.editCallsMock = append(r.editCallsMock, edit)
+	return r
+}
+
 func (r *mockRepository) Save(ctx context.Context, gainProjection repository.GainProjection) (*repository.GainProjection, error) {
 	if len(r.saveCallsMock) >= 1 {
 		save := r.saveCallsMock[0]
 		r.saveCallsMock = r.saveCallsMock[1:]
 		return save(ctx, gainProjection)
+	}
+	return nil, nil
+}
+
+func (r *mockRepository) Edit(ctx context.Context, gainProjection repository.GainProjection) (*repository.GainProjection, error) {
+	if len(r.editCallsMock) >= 1 {
+		edit := r.editCallsMock[0]
+		r.editCallsMock = r.editCallsMock[1:]
+		return edit(ctx, gainProjection)
 	}
 	return nil, nil
 }
