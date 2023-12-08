@@ -31,6 +31,29 @@ Este endpoint permite criar uma receita prevista
 
 ### /v1/gain-projection/{id}
 
+#### DELETE
+##### Summary
+
+Remove uma Receita Prevista
+
+##### Description
+
+Este endpoint permite remover uma receita prevista
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| id | path | Id da receita prevista | Yes | string |
+| X-Access-Token | header | Token de autenticação do usuário | Yes | string |
+| X-Userinfo | header | Informações do usuário em base64 | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | OK | [gainprojection.ResponseDefault](#gainprojectionresponsedefault) & { **"message"**: string, **"status"**: integer } |
+
 #### GET
 ##### Summary
 
@@ -79,6 +102,12 @@ Este endpoint permite editar uma receita prevista
 
 ---
 ### Models
+
+#### gainprojection.ResponseDefault
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| gainprojection.ResponseDefault | object |  |  |
 
 #### service.CategoryResponse
 

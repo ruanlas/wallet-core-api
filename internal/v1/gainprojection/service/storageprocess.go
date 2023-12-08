@@ -11,6 +11,7 @@ import (
 type StorageProcess interface {
 	Create(ctx context.Context, request CreateRequest) (*GainProjectionResponse, error)
 	Update(ctx context.Context, id string, request UpdateRequest) (*GainProjectionResponse, error)
+	Delete(ctx context.Context, id string) error
 }
 
 type storageProcess struct {
@@ -121,4 +122,8 @@ func (sp *storageProcess) Update(ctx context.Context, id string, request UpdateR
 		AddIsPassive(gainProjection.IsPassive).
 		AddCategory(CategoryResponse{Id: gainProjectionUpdated.Category.Id, Category: gainProjectionUpdated.Category.Category}).
 		Build(), nil
+}
+
+func (sp *storageProcess) Delete(ctx context.Context, id string) error {
+	return sp.repository.Remove(ctx, id)
 }

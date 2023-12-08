@@ -10,6 +10,7 @@ type Repository interface {
 	Save(ctx context.Context, gainProjection GainProjection) (*GainProjection, error)
 	GetById(ctx context.Context, id string) (*GainProjection, error)
 	Edit(ctx context.Context, gainProjection GainProjection) (*GainProjection, error)
+	Remove(ctx context.Context, id string) error
 }
 
 type repository struct {
@@ -21,7 +22,6 @@ func New(db *sql.DB) Repository {
 }
 
 func (r *repository) Save(ctx context.Context, gainProjection GainProjection) (*GainProjection, error) {
-	// tx, err := r.db.Begin()
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -133,4 +133,25 @@ func (r *repository) Edit(ctx context.Context, gainProjection GainProjection) (*
 		return nil, err
 	}
 	return &gainProjection, nil
+}
+
+func (r *repository) Remove(ctx context.Context, id string) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	stmt, err := tx.PrepareContext(ctx, `DELETE FROM gain_projection WHERE id = ?`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+	return nil
 }

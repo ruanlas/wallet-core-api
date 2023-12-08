@@ -32,6 +32,13 @@ func (sp *storageProcessMock) Update(ctx context.Context, id string, request ser
 	return sp.response, nil
 }
 
+func (sp *storageProcessMock) Delete(ctx context.Context, id string) error {
+	if sp.err != nil {
+		return sp.err
+	}
+	return nil
+}
+
 type readingProcessMock struct {
 	err      error
 	response *service.GainProjectionResponse

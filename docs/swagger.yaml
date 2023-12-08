@@ -1,5 +1,7 @@
 basePath: /api/
 definitions:
+  gainprojection.ResponseDefault:
+    type: object
   service.CategoryResponse:
     properties:
       category:
@@ -92,6 +94,43 @@ paths:
       tags:
       - Gain-Projection
   /v1/gain-projection/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Este endpoint permite remover uma receita prevista
+      parameters:
+      - description: Id da receita prevista
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      - description: Informações do usuário em base64
+        in: header
+        name: X-Userinfo
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/gainprojection.ResponseDefault'
+            - properties:
+                message:
+                  type: string
+                status:
+                  type: integer
+              type: object
+      summary: Remove uma Receita Prevista
+      tags:
+      - Gain-Projection
     get:
       consumes:
       - application/json

@@ -162,10 +162,72 @@ var doc = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "Este endpoint permite remover uma receita prevista",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Gain-Projection"
+                ],
+                "summary": "Remove uma Receita Prevista",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id da receita prevista",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Informações do usuário em base64",
+                        "name": "X-Userinfo",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/gainprojection.ResponseDefault"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
             }
         }
     },
     "definitions": {
+        "gainprojection.ResponseDefault": {
+            "type": "object"
+        },
         "service.CategoryResponse": {
             "type": "object",
             "properties": {

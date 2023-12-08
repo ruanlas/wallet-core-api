@@ -13,6 +13,10 @@ type Handler interface {
 	Create(c *gin.Context)
 	GetById(c *gin.Context)
 	Update(c *gin.Context)
+	Delete(c *gin.Context)
+}
+
+type ResponseDefault interface {
 }
 
 type handler struct {
@@ -123,4 +127,30 @@ func (h *handler) Update(c *gin.Context) {
 	}
 	span.End()
 	c.JSON(http.StatusOK, gainUpdated)
+}
+
+// @Summary Remove uma Receita Prevista
+// @Description Este endpoint permite remover uma receita prevista
+// @Tags Gain-Projection
+// @Accept json
+// @Produce json
+// @Param id path string true "Id da receita prevista"
+// @Param   X-Access-Token	header	string	true	"Token de autenticação do usuário"
+// @Param   X-Userinfo	header	string	true	"Informações do usuário em base64"
+// @Success 200 {object} ResponseDefault{status=int,message=string}
+// @Router /v1/gain-projection/{id} [delete]
+func (h *handler) Delete(c *gin.Context) {
+	ctx := c.Request.Context()
+	tx := apm.TransactionFromContext(ctx)
+
+	id := c.Param("id")
+	span := tx.StartSpan("GainProjection::StorageProcess::Delete", "Delete a gain-projection", nil)
+	err := h.storageProcess.Delete(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"status": http.StatusInternalServerError, "message": err.Error()})
+		tracing.SendSpanErr(span, err)
+		return
+	}
+	span.End()
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "message": "Gain projection removed"})
 }
