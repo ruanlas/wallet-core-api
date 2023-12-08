@@ -15,6 +15,7 @@ type mockRepository struct {
 	saveCallsMock   []func(ctx context.Context, gainProjection repository.GainProjection) (*repository.GainProjection, error)
 	getByIdCallMock []func(ctx context.Context, id string) (*repository.GainProjection, error)
 	editCallsMock   []func(ctx context.Context, gainProjection repository.GainProjection) (*repository.GainProjection, error)
+	removeCallsMock []func(ctx context.Context, id string) error
 }
 
 func (r *mockRepository) AddSaveCall(
@@ -32,6 +33,12 @@ func (r *mockRepository) AddGetByIdCall(
 func (r *mockRepository) AddEditCall(
 	edit func(ctx context.Context, gainProjection repository.GainProjection) (*repository.GainProjection, error)) *mockRepository {
 	r.editCallsMock = append(r.editCallsMock, edit)
+	return r
+}
+
+func (r *mockRepository) AddRemoveCall(
+	remove func(ctx context.Context, id string) error) *mockRepository {
+	r.removeCallsMock = append(r.removeCallsMock, remove)
 	return r
 }
 
@@ -60,6 +67,15 @@ func (r *mockRepository) GetById(ctx context.Context, id string) (*repository.Ga
 		return getById(ctx, id)
 	}
 	return nil, nil
+}
+
+func (r *mockRepository) Remove(ctx context.Context, id string) error {
+	if len(r.removeCallsMock) >= 1 {
+		remove := r.removeCallsMock[0]
+		r.removeCallsMock = r.removeCallsMock[1:]
+		return remove(ctx, id)
+	}
+	return nil
 }
 
 func TestCreateSuccessWithoutRecurrence(t *testing.T) {

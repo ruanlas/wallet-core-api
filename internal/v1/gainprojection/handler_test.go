@@ -32,6 +32,13 @@ func (sp *storageProcessMock) Update(ctx context.Context, id string, request ser
 	return sp.response, nil
 }
 
+func (sp *storageProcessMock) Delete(ctx context.Context, id string) error {
+	if sp.err != nil {
+		return sp.err
+	}
+	return nil
+}
+
 type readingProcessMock struct {
 	err      error
 	response *service.GainProjectionResponse
@@ -282,6 +289,40 @@ func TestUpdateFail(t *testing.T) {
 		"category_id": 2
 	}`)
 	req, _ := http.NewRequest("PUT", "/v1/gain-projection/9b15034f-85fe-4476-82b1-a95f438aadd5", bytes.NewReader(body))
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"message":"An error has been ocurred","status":500}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+}
+
+func TestDeleteSuccess(t *testing.T) {
+	_storageProcess := &storageProcessMock{}
+
+	handler := NewHandler(_storageProcess, nil)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.DELETE("/gain-projection/:id", handler.Delete)
+
+	req, _ := http.NewRequest("DELETE", "/v1/gain-projection/9b15034f-85fe-4476-82b1-a95f438aadd5", nil)
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"message":"Gain projection removed","status":200}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestDeleteFail(t *testing.T) {
+	_storageProcess := &storageProcessMock{err: errors.New("An error has been ocurred")}
+
+	handler := NewHandler(_storageProcess, nil)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.DELETE("/gain-projection/:id", handler.Delete)
+
+	req, _ := http.NewRequest("DELETE", "/v1/gain-projection/9b15034f-85fe-4476-82b1-a95f438aadd5", nil)
 
 	router.ServeHTTP(w, req)
 	bodyExpected := `{"message":"An error has been ocurred","status":500}`
