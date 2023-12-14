@@ -18,6 +18,7 @@ services:
       - ../../scripts/mysql/database_creation.sql:/docker-entrypoint-initdb.d/database_creation.sql
       - ../../scripts/mysql/database_init_load.sql:/docker-entrypoint-initdb.d/database_init_load.sql
       - ../../scripts/mysql/database_drop_tables.sql:/docker-entrypoint-initdb.d/database_drop_tables.sql
+      - ../../scripts/mysql/database_datafakes.sql:/docker-entrypoint-initdb.d/database_datafakes.sql
     environment:
       MYSQL_ROOT_PASSWORD: 123456
     

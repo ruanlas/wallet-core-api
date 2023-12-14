@@ -56,3 +56,41 @@ func (builder *GainProjectionResponseBuilder) Build() *GainProjectionResponse {
 
 	return &gainProjectionResponse
 }
+
+type SearchParamsBuilder struct {
+	month    *uint
+	year     *uint
+	page     *uint
+	pagesize *uint
+}
+
+func NewSearchParamsBuilder() *SearchParamsBuilder {
+	return &SearchParamsBuilder{}
+}
+
+func (builder *SearchParamsBuilder) AddMonth(month uint) *SearchParamsBuilder {
+	builder.month = &month
+	return builder
+}
+func (builder *SearchParamsBuilder) AddYear(year uint) *SearchParamsBuilder {
+	builder.year = &year
+	return builder
+}
+func (builder *SearchParamsBuilder) AddPage(page uint) *SearchParamsBuilder {
+	builder.page = &page
+	return builder
+}
+func (builder *SearchParamsBuilder) AddPageSize(pagesize uint) *SearchParamsBuilder {
+	builder.pagesize = &pagesize
+	return builder
+}
+func (builder *SearchParamsBuilder) Build() *SearchParams {
+	return &SearchParams{
+		month: builder.month,
+		year:  builder.year,
+		paginate: &Paginate{
+			page:     builder.page,
+			pagesize: builder.pagesize,
+		},
+	}
+}

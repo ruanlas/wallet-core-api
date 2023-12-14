@@ -18,3 +18,10 @@ type GainCategory struct {
 	Id       uint
 	Category string
 }
+
+type QueryParams struct {
+	month  uint
+	year   uint
+	limit  uint
+	offset uint
+}

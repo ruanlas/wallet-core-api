@@ -40,8 +40,9 @@ func (sp *storageProcessMock) Delete(ctx context.Context, id string) error {
 }
 
 type readingProcessMock struct {
-	err      error
-	response *service.GainProjectionResponse
+	err               error
+	response          *service.GainProjectionResponse
+	responsePaginated *service.GainProjectionPaginateResponse
 }
 
 func (rp *readingProcessMock) GetById(ctx context.Context, gainProjectionId string) (*service.GainProjectionResponse, error) {
@@ -49,6 +50,13 @@ func (rp *readingProcessMock) GetById(ctx context.Context, gainProjectionId stri
 		return nil, rp.err
 	}
 	return rp.response, nil
+}
+
+func (rp *readingProcessMock) GetAllPaginated(ctx context.Context, search service.SearchParams) (*service.GainProjectionPaginateResponse, error) {
+	if rp.err != nil {
+		return nil, rp.err
+	}
+	return rp.responsePaginated, nil
 }
 
 func TestCreateSuccess(t *testing.T) {
