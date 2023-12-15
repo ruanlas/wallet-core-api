@@ -337,3 +337,79 @@ func TestDeleteFail(t *testing.T) {
 	assert.Equal(t, bodyExpected, w.Body.String())
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 }
+
+func TestGetAllSuccess(t *testing.T) {
+	_readingProces := &readingProcessMock{
+		responsePaginated: &service.GainProjectionPaginateResponse{},
+	}
+
+	handler := NewHandler(nil, _readingProces)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.GET("/gain-projection", handler.GetAll)
+
+	req, _ := http.NewRequest("GET", "/v1/gain-projection?month=1&year=2023", nil)
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"current_page":0,"total_pages":0,"total_records":0,"page_limit":0,"records":null}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestGetAllParamMonthInvalid(t *testing.T) {
+	_readingProces := &readingProcessMock{
+		responsePaginated: &service.GainProjectionPaginateResponse{},
+	}
+
+	handler := NewHandler(nil, _readingProces)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.GET("/gain-projection", handler.GetAll)
+
+	req, _ := http.NewRequest("GET", "/v1/gain-projection?year=2023", nil)
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"message":"A param month 0 is invalid","status":400}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestGetAllParamYearInvalid(t *testing.T) {
+	_readingProces := &readingProcessMock{
+		responsePaginated: &service.GainProjectionPaginateResponse{},
+	}
+
+	handler := NewHandler(nil, _readingProces)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.GET("/gain-projection", handler.GetAll)
+
+	req, _ := http.NewRequest("GET", "/v1/gain-projection?month=1", nil)
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"message":"A param year 0 is invalid","status":400}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestGetAllFail(t *testing.T) {
+	_readingProces := &readingProcessMock{
+		err: errors.New("An error has been ocurred"),
+	}
+
+	handler := NewHandler(nil, _readingProces)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.GET("/gain-projection", handler.GetAll)
+
+	req, _ := http.NewRequest("GET", "/v1/gain-projection?month=1&year=2023", nil)
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"message":"An error has been ocurred","status":500}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+}
