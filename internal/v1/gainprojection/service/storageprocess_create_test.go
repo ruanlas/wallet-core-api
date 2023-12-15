@@ -12,10 +12,12 @@ import (
 )
 
 type mockRepository struct {
-	saveCallsMock   []func(ctx context.Context, gainProjection repository.GainProjection) (*repository.GainProjection, error)
-	getByIdCallMock []func(ctx context.Context, id string) (*repository.GainProjection, error)
-	editCallsMock   []func(ctx context.Context, gainProjection repository.GainProjection) (*repository.GainProjection, error)
-	removeCallsMock []func(ctx context.Context, id string) error
+	saveCallsMock            []func(ctx context.Context, gainProjection repository.GainProjection) (*repository.GainProjection, error)
+	getByIdCallsMock         []func(ctx context.Context, id string) (*repository.GainProjection, error)
+	editCallsMock            []func(ctx context.Context, gainProjection repository.GainProjection) (*repository.GainProjection, error)
+	removeCallsMock          []func(ctx context.Context, id string) error
+	getTotalRecordsCallsMock []func(ctx context.Context, params repository.QueryParams) (*uint, error)
+	getAllCallsMock          []func(ctx context.Context, params repository.QueryParams) (*[]repository.GainProjection, error)
 }
 
 func (r *mockRepository) AddSaveCall(
@@ -26,7 +28,7 @@ func (r *mockRepository) AddSaveCall(
 
 func (r *mockRepository) AddGetByIdCall(
 	getById func(ctx context.Context, id string) (*repository.GainProjection, error)) *mockRepository {
-	r.getByIdCallMock = append(r.getByIdCallMock, getById)
+	r.getByIdCallsMock = append(r.getByIdCallsMock, getById)
 	return r
 }
 
@@ -39,6 +41,18 @@ func (r *mockRepository) AddEditCall(
 func (r *mockRepository) AddRemoveCall(
 	remove func(ctx context.Context, id string) error) *mockRepository {
 	r.removeCallsMock = append(r.removeCallsMock, remove)
+	return r
+}
+
+func (r *mockRepository) AddGetTotalRecordsCalls(
+	getTotalRecords func(ctx context.Context, params repository.QueryParams) (*uint, error)) *mockRepository {
+	r.getTotalRecordsCallsMock = append(r.getTotalRecordsCallsMock, getTotalRecords)
+	return r
+}
+
+func (r *mockRepository) AddGetAllCalls(
+	getAll func(ctx context.Context, params repository.QueryParams) (*[]repository.GainProjection, error)) *mockRepository {
+	r.getAllCallsMock = append(r.getAllCallsMock, getAll)
 	return r
 }
 
@@ -61,9 +75,9 @@ func (r *mockRepository) Edit(ctx context.Context, gainProjection repository.Gai
 }
 
 func (r *mockRepository) GetById(ctx context.Context, id string) (*repository.GainProjection, error) {
-	if len(r.getByIdCallMock) >= 1 {
-		getById := r.getByIdCallMock[0]
-		r.getByIdCallMock = r.getByIdCallMock[1:]
+	if len(r.getByIdCallsMock) >= 1 {
+		getById := r.getByIdCallsMock[0]
+		r.getByIdCallsMock = r.getByIdCallsMock[1:]
 		return getById(ctx, id)
 	}
 	return nil, nil
@@ -76,6 +90,24 @@ func (r *mockRepository) Remove(ctx context.Context, id string) error {
 		return remove(ctx, id)
 	}
 	return nil
+}
+
+func (r *mockRepository) GetTotalRecords(ctx context.Context, params repository.QueryParams) (*uint, error) {
+	if len(r.getTotalRecordsCallsMock) >= 1 {
+		getTotalRecords := r.getTotalRecordsCallsMock[0]
+		r.getTotalRecordsCallsMock = r.getTotalRecordsCallsMock[1:]
+		return getTotalRecords(ctx, params)
+	}
+	return nil, nil
+}
+
+func (r *mockRepository) GetAll(ctx context.Context, params repository.QueryParams) (*[]repository.GainProjection, error) {
+	if len(r.getAllCallsMock) >= 1 {
+		getAll := r.getAllCallsMock[0]
+		r.getAllCallsMock = r.getAllCallsMock[1:]
+		return getAll(ctx, params)
+	}
+	return nil, nil
 }
 
 func TestCreateSuccessWithoutRecurrence(t *testing.T) {

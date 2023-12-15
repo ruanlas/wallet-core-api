@@ -14,6 +14,7 @@ type Handler interface {
 	GetById(c *gin.Context)
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
+	GetAll(c *gin.Context)
 }
 
 type ResponseDefault interface {
@@ -153,4 +154,37 @@ func (h *handler) Delete(c *gin.Context) {
 	}
 	span.End()
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "message": "Gain projection removed"})
+}
+
+// @Summary Obter uma Receita Prevista
+// @Description Este endpoint permite obter uma receita prevista
+// @Tags Gain-Projection
+// @Accept json
+// @Produce json
+// @Param page_size query string false "O número de registros retornados pela busca"
+// @Param page query string false "A página que será buscada"
+// @Param month query string true "O mês que será filtrado a busca"
+// @Param year query string true "O ano que será filtrado a busca"
+// @Param   X-Access-Token	header	string	true	"Token de autenticação do usuário"
+// @Param   X-Userinfo	header	string	true	"Informações do usuário em base64"
+// @Success 200 {object} service.GainProjectionPaginateResponse
+// @Router /v1/gain-projection [get]
+func (h *handler) GetAll(c *gin.Context) {
+	ctx := c.Request.Context()
+	tx := apm.TransactionFromContext(ctx)
+
+	searchParams, err := validateAndGetSearchParams(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "message": err.Error()})
+		return
+	}
+	span := tx.StartSpan("GainProjection::StorageProcess::GetAllPaginated", "Get a gain-projection paginated", nil)
+	resultPaginated, err := h.readingProcess.GetAllPaginated(ctx, *searchParams)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"status": http.StatusInternalServerError, "message": err.Error()})
+		tracing.SendSpanErr(span, err)
+		return
+	}
+	span.End()
+	c.JSON(http.StatusOK, resultPaginated)
 }

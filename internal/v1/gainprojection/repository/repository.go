@@ -11,6 +11,8 @@ type Repository interface {
 	GetById(ctx context.Context, id string) (*GainProjection, error)
 	Edit(ctx context.Context, gainProjection GainProjection) (*GainProjection, error)
 	Remove(ctx context.Context, id string) error
+	GetTotalRecords(ctx context.Context, params QueryParams) (*uint, error)
+	GetAll(ctx context.Context, params QueryParams) (*[]GainProjection, error)
 }
 
 type repository struct {
@@ -154,4 +156,74 @@ func (r *repository) Remove(ctx context.Context, id string) error {
 		return err
 	}
 	return nil
+}
+
+func (r *repository) GetTotalRecords(ctx context.Context, params QueryParams) (*uint, error) {
+	var totalRecords uint
+	query := `SELECT COUNT(*) as total_records FROM gain_projection WHERE MONTH(pay_in) = ? AND YEAR(pay_in) = ?`
+	row := r.db.QueryRowContext(ctx, query, params.month, params.year)
+	err := row.Scan(&totalRecords)
+	if err != nil {
+		return nil, err
+	}
+	return &totalRecords, nil
+}
+
+func (r *repository) GetAll(ctx context.Context, params QueryParams) (*[]GainProjection, error) {
+	query := `
+		SELECT
+			gp.id,
+			gp.created_at,
+			gp.pay_in,
+			gp.description,
+			gp.value,
+			gp.is_passive,
+			gp.is_done,
+			gp.user_id,
+			gc.id,
+			gc.category
+		FROM
+			gain_projection gp
+		INNER JOIN gain_category gc ON 
+			gc.id = gp.category_id
+		WHERE 
+			MONTH(gp.pay_in) = ? AND YEAR(gp.pay_in) = ?
+		LIMIT ? OFFSET ?`
+	rows, err := r.db.QueryContext(ctx, query, params.month, params.year, params.limit, params.offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var gainProjectionList []GainProjection
+	for rows.Next() {
+		var value sql.NullFloat64
+		var categoryId sql.NullInt64
+		var createdAtTimestamp sql.NullInt64
+		var gp GainProjection
+		var category GainCategory
+
+		err := rows.Scan(
+			&gp.Id,
+			&createdAtTimestamp,
+			&gp.PayIn,
+			&gp.Description,
+			&value,
+			&gp.IsPassive,
+			&gp.IsDone,
+			&gp.UserId,
+			&categoryId,
+			&category.Category)
+		if err != nil {
+			return nil, err
+		}
+		gp.CreatedAt = time.Unix(createdAtTimestamp.Int64, 0)
+		gp.Value = value.Float64
+		category.Id = uint(categoryId.Int64)
+		gp.Category = category
+
+		gainProjectionList = append(gainProjectionList, gp)
+	}
+
+	return &gainProjectionList, nil
 }

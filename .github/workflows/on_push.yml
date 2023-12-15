@@ -1,0 +1,36 @@
+name: Pushing
+
+on: 
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  create-documentation:
+    name: Create documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Show branch name
+        run: echo ${GITHUB_REF##*/}
+
+      - name: Generate documentation
+        run: make doc-generate
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+        id: extract_branch
+
+      - name: Update documentation
+        uses: test-room-7/action-update-file@v1
+        with:
+            file-path: |
+              docs/docs.go
+              docs/swagger.yaml
+              docs/swagger.json
+              API_DOC.md              
+            commit-msg: Update documentation on ${{ steps.extract_branch.outputs.branch }}
+            branch: ${{ steps.extract_branch.outputs.branch }}
+            github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -40,8 +40,9 @@ func (sp *storageProcessMock) Delete(ctx context.Context, id string) error {
 }
 
 type readingProcessMock struct {
-	err      error
-	response *service.GainProjectionResponse
+	err               error
+	response          *service.GainProjectionResponse
+	responsePaginated *service.GainProjectionPaginateResponse
 }
 
 func (rp *readingProcessMock) GetById(ctx context.Context, gainProjectionId string) (*service.GainProjectionResponse, error) {
@@ -49,6 +50,13 @@ func (rp *readingProcessMock) GetById(ctx context.Context, gainProjectionId stri
 		return nil, rp.err
 	}
 	return rp.response, nil
+}
+
+func (rp *readingProcessMock) GetAllPaginated(ctx context.Context, search service.SearchParams) (*service.GainProjectionPaginateResponse, error) {
+	if rp.err != nil {
+		return nil, rp.err
+	}
+	return rp.responsePaginated, nil
 }
 
 func TestCreateSuccess(t *testing.T) {
@@ -323,6 +331,82 @@ func TestDeleteFail(t *testing.T) {
 	apiRouter.DELETE("/gain-projection/:id", handler.Delete)
 
 	req, _ := http.NewRequest("DELETE", "/v1/gain-projection/9b15034f-85fe-4476-82b1-a95f438aadd5", nil)
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"message":"An error has been ocurred","status":500}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+}
+
+func TestGetAllSuccess(t *testing.T) {
+	_readingProces := &readingProcessMock{
+		responsePaginated: &service.GainProjectionPaginateResponse{},
+	}
+
+	handler := NewHandler(nil, _readingProces)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.GET("/gain-projection", handler.GetAll)
+
+	req, _ := http.NewRequest("GET", "/v1/gain-projection?month=1&year=2023", nil)
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"current_page":0,"total_pages":0,"total_records":0,"page_limit":0,"records":null}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestGetAllParamMonthInvalid(t *testing.T) {
+	_readingProces := &readingProcessMock{
+		responsePaginated: &service.GainProjectionPaginateResponse{},
+	}
+
+	handler := NewHandler(nil, _readingProces)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.GET("/gain-projection", handler.GetAll)
+
+	req, _ := http.NewRequest("GET", "/v1/gain-projection?year=2023", nil)
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"message":"A param month 0 is invalid","status":400}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestGetAllParamYearInvalid(t *testing.T) {
+	_readingProces := &readingProcessMock{
+		responsePaginated: &service.GainProjectionPaginateResponse{},
+	}
+
+	handler := NewHandler(nil, _readingProces)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.GET("/gain-projection", handler.GetAll)
+
+	req, _ := http.NewRequest("GET", "/v1/gain-projection?month=1", nil)
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"message":"A param year 0 is invalid","status":400}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestGetAllFail(t *testing.T) {
+	_readingProces := &readingProcessMock{
+		err: errors.New("An error has been ocurred"),
+	}
+
+	handler := NewHandler(nil, _readingProces)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.GET("/gain-projection", handler.GetAll)
+
+	req, _ := http.NewRequest("GET", "/v1/gain-projection?month=1&year=2023", nil)
 
 	router.ServeHTTP(w, req)
 	bodyExpected := `{"message":"An error has been ocurred","status":500}`

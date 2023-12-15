@@ -8,10 +8,11 @@ help:
 	@echo "------------------------------------- COMANDOS DO PROJETO -------------------------------------"
 	@echo "-----------------------------------------------------------------------------------------------"
 	@echo "- Ambiente de desenvolvimento -----------------------------------------------------------------"
-	@echo "# make dev-start       =====>> Inicia o ambiente de desenvolvimento"
-	@echo "# make dev-stop        =====>> Interrompe o ambiente de desenvolvimento"
-	@echo "# make dev-init-load   =====>> Carrega as informações iniciais no banco de dados"
-	@echo "# make dev-drop-tables =====>> Remove todos os registros do banco de dados"
+	@echo "# make dev-start         =====>> Inicia o ambiente de desenvolvimento"
+	@echo "# make dev-stop          =====>> Interrompe o ambiente de desenvolvimento"
+	@echo "# make dev-init-load     =====>> Carrega as informações iniciais no banco de dados"
+	@echo "# make dev-drop-tables   =====>> Remove todos os registros do banco de dados"
+	@echo "# make dev-datafake-load =====>> Carrega o banco de dados com dados fakes"
 	@echo "-----------------------------------------------------------------------------------------------"
 	@echo "- Comandos da aplicação -----------------------------------------------------------------------"
 	@echo "# make test            =====>> Executa os testes unitários do projeto"
@@ -29,6 +30,9 @@ dev-stop:
 
 dev-init-load:
 	docker exec -i wallet-db sh -c 'exec mysql -uroot -p123456 --default-character-set=utf8mb4 wallet_core < /docker-entrypoint-initdb.d/database_init_load.sql'
+
+dev-datafake-load:
+	docker exec -i wallet-db sh -c 'exec mysql -uroot -p123456 --default-character-set=utf8mb4 wallet_core < /docker-entrypoint-initdb.d/database_datafakes.sql'
 
 dev-drop-tables:
 	docker exec -i wallet-db sh -c 'exec mysql -uroot -p123456 --default-character-set=utf8mb4 wallet_core < /docker-entrypoint-initdb.d/database_drop_tables.sql'
