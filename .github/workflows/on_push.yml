@@ -30,7 +30,7 @@ jobs:
               docs/docs.go
               docs/swagger.yaml
               docs/swagger.json
-              API_DOC.md              
+              api_doc.md              
             commit-msg: Update documentation on ${{ steps.extract_branch.outputs.branch }}
             branch: ${{ steps.extract_branch.outputs.branch }}
             github-token: ${{ secrets.GITHUB_TOKEN }}
