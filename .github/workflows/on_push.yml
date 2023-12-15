@@ -16,7 +16,7 @@ jobs:
         run: echo ${GITHUB_REF##*/}
 
       - name: Generate documentation
-        run: make doc-generate
+        run: make doc-gitflow-generate
 
       - name: Extract branch name
         shell: bash

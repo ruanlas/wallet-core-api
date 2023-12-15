@@ -56,6 +56,13 @@ endif
 push-image: build-image
 	@echo "docker push ruanlas/$(IMAGE_NAME):$(TAG)"
 
+doc-gitflow-generate:
+	@echo "Gerando documentação do swagger"
+	docker run --rm -v "$(PWD):/work" ruanlas/go-swagger-generator:v1.0.0 swag init -g cmd/main.go
+	@echo "Convertendo a documentação do swagger em markdown"
+	docker run --rm -v "$(PWD):/work" ruanlas/swagger-to-markdown-convert:v1.0.0 swagger-markdown -i ./docs/swagger.yaml -o ./api_doc.md
+	@echo "Concluído"
+
 doc-generate:
 	@echo "Gerando documentação do swagger"
 	docker run --rm -it -v "$(PWD):/work" ruanlas/go-swagger-generator:v1.0.0 swag init -g cmd/main.go
