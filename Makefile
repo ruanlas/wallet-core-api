@@ -1,26 +1,27 @@
 help:
-	@echo "-----------------------------------------------------------------------------------------------"
-	@echo "-------------------------------------- VARIÁVEIS DO MAKE --------------------------------------"
-	@echo "-----------------------------------------------------------------------------------------------"
-	@echo "# IMAGE_NAME           =====>> Nome da imagem docker"
-	@echo "# TAG                  =====>> Tag/versão da imagem docker"
-	@echo "-----------------------------------------------------------------------------------------------"
-	@echo "------------------------------------- COMANDOS DO PROJETO -------------------------------------"
-	@echo "-----------------------------------------------------------------------------------------------"
-	@echo "- Ambiente de desenvolvimento -----------------------------------------------------------------"
-	@echo "# make dev-start         =====>> Inicia o ambiente de desenvolvimento"
-	@echo "# make dev-stop          =====>> Interrompe o ambiente de desenvolvimento"
-	@echo "# make dev-init-load     =====>> Carrega as informações iniciais no banco de dados"
-	@echo "# make dev-drop-tables   =====>> Remove todos os registros do banco de dados"
-	@echo "# make dev-datafake-load =====>> Carrega o banco de dados com dados fakes"
-	@echo "-----------------------------------------------------------------------------------------------"
-	@echo "- Comandos da aplicação -----------------------------------------------------------------------"
-	@echo "# make test            =====>> Executa os testes unitários do projeto"
-	@echo "# make build-go-app    =====>> Faz o build da aplicação e gera o binário em ./build/app/"
-	@echo "# make build-image     =====>> Gera a imagem docker do projeto"
-	@echo "# make push-image      =====>> Envia a imagem docker para o repositório de imagens"
-	@echo "# make doc-generate    =====>> Gera a documentação em swagger e também converte para markdown"
-	@echo "-----------------------------------------------------------------------------------------------"
+	@echo "-------------------------------------------------------------------------------------------------------"
+	@echo "------------------------------------------ VARIÁVEIS DO MAKE ------------------------------------------"
+	@echo "-------------------------------------------------------------------------------------------------------"
+	@echo "# IMAGE_NAME                 =====>> Nome da imagem docker"
+	@echo "# TAG                        =====>> Tag/versão da imagem docker"
+	@echo "-------------------------------------------------------------------------------------------------------"
+	@echo "----------------------------------------- COMANDOS DO PROJETO -----------------------------------------"
+	@echo "-------------------------------------------------------------------------------------------------------"
+	@echo "- Ambiente de desenvolvimento -------------------------------------------------------------------------"
+	@echo "# make dev-start             =====>> Inicia o ambiente de desenvolvimento"
+	@echo "# make dev-stop              =====>> Interrompe o ambiente de desenvolvimento"
+	@echo "# make dev-init-load         =====>> Carrega as informações iniciais no banco de dados"
+	@echo "# make dev-drop-tables       =====>> Remove todos os registros do banco de dados"
+	@echo "# make dev-datafake-load     =====>> Carrega o banco de dados com dados fakes"
+	@echo "-------------------------------------------------------------------------------------------------------"
+	@echo "- Comandos da aplicação -------------------------------------------------------------------------------"
+	@echo "# make test                  =====>> Executa os testes unitários do projeto"
+	@echo "# make build-go-app          =====>> Faz o build da aplicação e gera o binário em ./build/app/"
+	@echo "# make build-image           =====>> Gera a imagem docker do projeto"
+	@echo "# make push-image            =====>> Envia a imagem docker para o repositório de imagens"
+	@echo "# make doc-generate          =====>> Gera a documentação em swagger e também converte para markdown"
+	@echo "# make gitflow-doc-generate  =====>> Mesmo que o comando [make doc-generate]. Exclusivo para workflow"
+	@echo "-------------------------------------------------------------------------------------------------------"
 
 dev-start:
 	docker compose -f build/dev/docker-compose.yml up -d
@@ -56,7 +57,7 @@ endif
 push-image: build-image
 	@echo "docker push ruanlas/$(IMAGE_NAME):$(TAG)"
 
-doc-gitflow-generate:
+gitflow-doc-generate:
 	@echo "Gerando documentação do swagger"
 	docker run --rm -v "$(PWD):/work" ruanlas/go-swagger-generator:v1.0.0 swag init -g cmd/main.go
 	@echo "Convertendo a documentação do swagger em markdown"
