@@ -24,6 +24,21 @@ definitions:
       value:
         type: number
     type: object
+  service.GainProjectionPaginateResponse:
+    properties:
+      current_page:
+        type: integer
+      page_limit:
+        type: integer
+      records:
+        items:
+          $ref: '#/definitions/service.GainProjectionResponse'
+        type: array
+      total_pages:
+        type: integer
+      total_records:
+        type: integer
+    type: object
   service.GainProjectionResponse:
     properties:
       category:
@@ -62,6 +77,49 @@ info:
   version: 0.1.0
 paths:
   /v1/gain-projection:
+    get:
+      consumes:
+      - application/json
+      description: Este endpoint permite obter uma receita prevista
+      parameters:
+      - description: O número de registros retornados pela busca
+        in: query
+        name: page_size
+        type: string
+      - description: A página que será buscada
+        in: query
+        name: page
+        type: string
+      - description: O mês que será filtrado a busca
+        in: query
+        name: month
+        required: true
+        type: string
+      - description: O ano que será filtrado a busca
+        in: query
+        name: year
+        required: true
+        type: string
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      - description: Informações do usuário em base64
+        in: header
+        name: X-Userinfo
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.GainProjectionPaginateResponse'
+      summary: Obter uma Receita Prevista
+      tags:
+      - Gain-Projection
     post:
       consumes:
       - application/json

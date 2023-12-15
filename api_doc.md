@@ -6,6 +6,32 @@ API que dispões de recursos para gerenciar as finanças pessoais
 ---
 ### /v1/gain-projection
 
+#### GET
+##### Summary
+
+Obter uma Receita Prevista
+
+##### Description
+
+Este endpoint permite obter uma receita prevista
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| page_size | query | O número de registros retornados pela busca | No | string |
+| page | query | A página que será buscada | No | string |
+| month | query | O mês que será filtrado a busca | Yes | string |
+| year | query | O ano que será filtrado a busca | Yes | string |
+| X-Access-Token | header | Token de autenticação do usuário | Yes | string |
+| X-Userinfo | header | Informações do usuário em base64 | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | OK | [service.GainProjectionPaginateResponse](#servicegainprojectionpaginateresponse) |
+
 #### POST
 ##### Summary
 
@@ -126,6 +152,16 @@ Este endpoint permite editar uma receita prevista
 | pay_in | string |  | No |
 | recurrence | integer |  | No |
 | value | number |  | No |
+
+#### service.GainProjectionPaginateResponse
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| current_page | integer |  | No |
+| page_limit | integer |  | No |
+| records | [ [service.GainProjectionResponse](#servicegainprojectionresponse) ] |  | No |
+| total_pages | integer |  | No |
+| total_records | integer |  | No |
 
 #### service.GainProjectionResponse
 

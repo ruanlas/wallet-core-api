@@ -25,6 +25,69 @@ var doc = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/v1/gain-projection": {
+            "get": {
+                "description": "Este endpoint permite obter uma receita prevista",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Gain-Projection"
+                ],
+                "summary": "Obter uma Receita Prevista",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "O número de registros retornados pela busca",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "A página que será buscada",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "O mês que será filtrado a busca",
+                        "name": "month",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "O ano que será filtrado a busca",
+                        "name": "year",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Informações do usuário em base64",
+                        "name": "X-Userinfo",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.GainProjectionPaginateResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Este endpoint permite criar uma receita prevista",
                 "consumes": [
@@ -259,6 +322,29 @@ var doc = `{
                 },
                 "value": {
                     "type": "number"
+                }
+            }
+        },
+        "service.GainProjectionPaginateResponse": {
+            "type": "object",
+            "properties": {
+                "current_page": {
+                    "type": "integer"
+                },
+                "page_limit": {
+                    "type": "integer"
+                },
+                "records": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.GainProjectionResponse"
+                    }
+                },
+                "total_pages": {
+                    "type": "integer"
+                },
+                "total_records": {
+                    "type": "integer"
                 }
             }
         },
