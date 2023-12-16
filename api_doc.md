@@ -9,11 +9,11 @@ API que dispões de recursos para gerenciar as finanças pessoais
 #### GET
 ##### Summary
 
-Obter uma Receita Prevista
+Obter uma listagem de Receitas Previstas
 
 ##### Description
 
-Este endpoint permite obter uma receita prevista
+Este endpoint permite obter uma listagem de receitas previstas
 
 ##### Parameters
 

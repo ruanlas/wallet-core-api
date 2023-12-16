@@ -1,6 +1,9 @@
 package routes
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/ruanlas/wallet-core-api/docs"
 	v1 "github.com/ruanlas/wallet-core-api/internal/v1"
@@ -18,10 +21,13 @@ func NewRouter(apiV1 v1.Api) *Router {
 }
 
 func (r *Router) SetupRoutes() {
+	servicePort := os.Getenv("SERVICE_PORT")
+	serviceHost := os.Getenv("SERVICE_HOST")
 	router := gin.Default()
 	router.Use(apmgin.Middleware(router))
 
 	docs.SwaggerInfo.BasePath = "/"
+	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", serviceHost, servicePort)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	v1router := router.Group("/v1")
 	v1router.POST("/gain-projection", r.apiV1.GetGainProjectionHandler().Create)
@@ -30,5 +36,6 @@ func (r *Router) SetupRoutes() {
 	v1router.PUT("/gain-projection/:id", r.apiV1.GetGainProjectionHandler().Update)
 	v1router.DELETE("/gain-projection/:id", r.apiV1.GetGainProjectionHandler().Delete)
 
-	router.Run(":8080")
+	serviceAddr := fmt.Sprintf(":%s", servicePort)
+	router.Run(serviceAddr)
 }

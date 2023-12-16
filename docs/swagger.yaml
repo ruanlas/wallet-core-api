@@ -80,7 +80,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Este endpoint permite obter uma receita prevista
+      description: Este endpoint permite obter uma listagem de receitas previstas
       parameters:
       - description: O número de registros retornados pela busca
         in: query
@@ -117,7 +117,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/service.GainProjectionPaginateResponse'
-      summary: Obter uma Receita Prevista
+      summary: Obter uma listagem de Receitas Previstas
       tags:
       - Gain-Projection
     post:
