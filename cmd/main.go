@@ -23,15 +23,36 @@ var (
 	db *sql.DB
 )
 
+var requiredEnvs = []string{
+	"SERVICE_HOST", "SERVICE_PORT", "PROMETHEUS_PORT",
+	"DATABASE_HOST", "DATABASE_PORT", "DATABASE_NAME", "DATABASE_USERNAME", "DATABASE_PASSWORD",
+}
+
+func checkRequiredEnvs() {
+	for _, envName := range requiredEnvs {
+		if os.Getenv(envName) == "" {
+			panic(fmt.Sprintf("You must to define %s env", envName))
+		}
+	}
+}
+
 func init() {
 	env := os.Getenv("ENV")
 	if env == "" {
 		godotenv.Load()
 	}
+	checkRequiredEnvs()
 
+	dbUsername := os.Getenv("DATABASE_USERNAME")
+	dbPassword := os.Getenv("DATABASE_PASSWORD")
+	dbHost := os.Getenv("DATABASE_HOST")
+	dbPort := os.Getenv("DATABASE_PORT")
+	dbName := os.Getenv("DATABASE_NAME")
 	var err error
 	// db, err = sql.Open("mysql", "root:123456@tcp(localhost:3306)/wallet_core?charset=utf8&parseTime=True&loc=Local")
-	db, err = apmsql.Open("mysql", "root:123456@tcp(localhost:3306)/wallet_core?charset=utf8&parseTime=True&loc=Local")
+	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		dbUsername, dbPassword, dbHost, dbPort, dbName)
+	db, err = apmsql.Open("mysql", connectionString)
 	if err != nil {
 		panic(err)
 	}
@@ -62,11 +83,13 @@ func main() {
 }
 
 func startPrometheus() {
-	log.Println("Prometheus metrics on /metrics port 2112")
+	prometheusPort := os.Getenv("PROMETHEUS_PORT")
+	log.Println("Prometheus metrics on /metrics port", prometheusPort)
 	http.Handle("/metrics", promhttp.Handler())
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		res := "{ \"status\": \"ok\" }"
 		w.Write([]byte(res))
 	})
-	http.ListenAndServe(":2112", nil)
+	prometheusAddr := fmt.Sprintf(":%s", prometheusPort)
+	http.ListenAndServe(prometheusAddr, nil)
 }

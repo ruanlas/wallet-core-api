@@ -156,8 +156,8 @@ func (h *handler) Delete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "message": "Gain projection removed"})
 }
 
-// @Summary Obter uma Receita Prevista
-// @Description Este endpoint permite obter uma receita prevista
+// @Summary Obter uma listagem de Receitas Previstas
+// @Description Este endpoint permite obter uma listagem de receitas previstas
 // @Tags Gain-Projection
 // @Accept json
 // @Produce json

@@ -26,7 +26,7 @@ var doc = `{
     "paths": {
         "/v1/gain-projection": {
             "get": {
-                "description": "Este endpoint permite obter uma receita prevista",
+                "description": "Este endpoint permite obter uma listagem de receitas previstas",
                 "consumes": [
                     "application/json"
                 ],
@@ -36,7 +36,7 @@ var doc = `{
                 "tags": [
                     "Gain-Projection"
                 ],
-                "summary": "Obter uma Receita Prevista",
+                "summary": "Obter uma listagem de Receitas Previstas",
                 "parameters": [
                     {
                         "type": "string",
