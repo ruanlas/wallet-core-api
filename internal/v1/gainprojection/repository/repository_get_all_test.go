@@ -30,7 +30,7 @@ func TestGetAllSuccess(t *testing.T) {
 		AddCreatedAt(now).
 		AddPayIn(now).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(GainCategory{Id: 1, Category: "Salário"}).
 		AddDescription("Description de teste").
 		AddValue(500.50).
@@ -44,7 +44,7 @@ func TestGetAllSuccess(t *testing.T) {
 		"description",
 		"value",
 		"is_passive",
-		"is_done",
+		"is_already_done",
 		"user_id",
 		"category_id",
 		"category",
@@ -55,7 +55,7 @@ func TestGetAllSuccess(t *testing.T) {
 		gainPMock.Description,
 		gainPMock.Value,
 		gainPMock.IsPassive,
-		gainPMock.IsDone,
+		gainPMock.IsAlreadyDone,
 		gainPMock.UserId,
 		gainPMock.Category.Id,
 		gainPMock.Category.Category,
@@ -71,7 +71,7 @@ func TestGetAllSuccess(t *testing.T) {
 			gp.description,
 			gp.value,
 			gp.is_passive,
-			gp.is_done,
+			gp.is_already_done,
 			gp.user_id,
 			gc.id,
 			gc.category
@@ -118,7 +118,7 @@ func TestGetAllQueryFail(t *testing.T) {
 			gp.description,
 			gp.value,
 			gp.is_passive,
-			gp.is_done,
+			gp.is_already_done,
 			gp.user_id,
 			gc.id,
 			gc.category
@@ -161,7 +161,7 @@ func TestGetAllScanFail(t *testing.T) {
 		"description",
 		"value",
 		"is_passive",
-		"is_done",
+		"is_already_done",
 		"user_id",
 		"category_id",
 		"category",
@@ -188,7 +188,7 @@ func TestGetAllScanFail(t *testing.T) {
 			gp.description,
 			gp.value,
 			gp.is_passive,
-			gp.is_done,
+			gp.is_already_done,
 			gp.user_id,
 			gc.id,
 			gc.category

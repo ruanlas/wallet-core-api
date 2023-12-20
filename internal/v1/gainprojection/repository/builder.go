@@ -3,15 +3,15 @@ package repository
 import "time"
 
 type GainProjectionBuilder struct {
-	id          string
-	createdAt   time.Time
-	payIn       time.Time
-	description string
-	value       float64
-	isPassive   bool
-	isDone      bool
-	userId      string
-	category    GainCategory
+	id            string
+	createdAt     time.Time
+	payIn         time.Time
+	description   string
+	value         float64
+	isPassive     bool
+	isAlreadyDone bool
+	userId        string
+	category      GainCategory
 }
 
 func NewGainProjectionBuilder() *GainProjectionBuilder {
@@ -41,8 +41,8 @@ func (builder *GainProjectionBuilder) AddIsPassive(isPassive bool) *GainProjecti
 	builder.isPassive = isPassive
 	return builder
 }
-func (builder *GainProjectionBuilder) AddIsDone(isDone bool) *GainProjectionBuilder {
-	builder.isDone = isDone
+func (builder *GainProjectionBuilder) AddIsAlreadyDone(isAlreadyDone bool) *GainProjectionBuilder {
+	builder.isAlreadyDone = isAlreadyDone
 	return builder
 }
 func (builder *GainProjectionBuilder) AddUserId(userId string) *GainProjectionBuilder {
@@ -62,7 +62,7 @@ func (builder *GainProjectionBuilder) Build() *GainProjection {
 	gainProjection.Description = builder.description
 	gainProjection.Value = builder.value
 	gainProjection.IsPassive = builder.isPassive
-	gainProjection.IsDone = builder.isDone
+	gainProjection.IsAlreadyDone = builder.isAlreadyDone
 	gainProjection.UserId = builder.userId
 	gainProjection.Category = builder.category
 
@@ -102,4 +102,71 @@ func (builder *QueryParamsBuilder) Build() QueryParams {
 		limit:  builder.limit,
 		offset: builder.offset,
 	}
+}
+
+type GainBuilder struct {
+	id               string
+	createdAt        time.Time
+	payIn            time.Time
+	description      string
+	value            float64
+	isPassive        bool
+	userId           string
+	category         GainCategory
+	gainProjectionId string
+}
+
+func NewGainBuilder() *GainBuilder {
+	return &GainBuilder{}
+}
+func (builder *GainBuilder) AddId(id string) *GainBuilder {
+	builder.id = id
+	return builder
+}
+func (builder *GainBuilder) AddCreatedAt(createdAt time.Time) *GainBuilder {
+	builder.createdAt = createdAt
+	return builder
+}
+func (builder *GainBuilder) AddPayIn(payIn time.Time) *GainBuilder {
+	builder.payIn = payIn
+	return builder
+}
+func (builder *GainBuilder) AddDescription(description string) *GainBuilder {
+	builder.description = description
+	return builder
+}
+func (builder *GainBuilder) AddValue(value float64) *GainBuilder {
+	builder.value = value
+	return builder
+}
+func (builder *GainBuilder) AddIsPassive(isPassive bool) *GainBuilder {
+	builder.isPassive = isPassive
+	return builder
+}
+func (builder *GainBuilder) AddGainProjectionId(gainProjectionId string) *GainBuilder {
+	builder.gainProjectionId = gainProjectionId
+	return builder
+}
+func (builder *GainBuilder) AddUserId(userId string) *GainBuilder {
+	builder.userId = userId
+	return builder
+}
+func (builder *GainBuilder) AddCategory(category GainCategory) *GainBuilder {
+	builder.category = category
+	return builder
+}
+func (builder *GainBuilder) Build() *Gain {
+	gain := Gain{}
+
+	gain.Id = builder.id
+	gain.CreatedAt = builder.createdAt
+	gain.PayIn = builder.payIn
+	gain.Description = builder.description
+	gain.Value = builder.value
+	gain.IsPassive = builder.isPassive
+	gain.GainProjectionId = builder.gainProjectionId
+	gain.UserId = builder.userId
+	gain.Category = builder.category
+
+	return &gain
 }

@@ -15,6 +15,7 @@ type Handler interface {
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
 	GetAll(c *gin.Context)
+	CreateGain(c *gin.Context)
 }
 
 type ResponseDefault interface {
@@ -35,7 +36,7 @@ func NewHandler(storageProcess service.StorageProcess, readingProcess service.Re
 // @Tags Gain-Projection
 // @Accept json
 // @Produce json
-// @Param gain_projection body service.CreateRequest true "Modelo de criação da receita"
+// @Param gain_projection body service.CreateRequest true "Modelo de criação da receita prevista"
 // @Param   X-Access-Token	header	string	true	"Token de autenticação do usuário"
 // @Param   X-Userinfo	header	string	true	"Informações do usuário em base64"
 // @Success 201 {object} service.GainProjectionResponse
@@ -99,7 +100,7 @@ func (h *handler) GetById(c *gin.Context) {
 // @Tags Gain-Projection
 // @Accept json
 // @Produce json
-// @Param gain_projection body service.UpdateRequest true "Modelo de edição da receita"
+// @Param gain_projection body service.UpdateRequest true "Modelo de edição da receita prevista"
 // @Param   X-Access-Token	header	string	true	"Token de autenticação do usuário"
 // @Param   X-Userinfo	header	string	true	"Informações do usuário em base64"
 // @Success 200 {object} service.GainProjectionResponse
@@ -178,7 +179,7 @@ func (h *handler) GetAll(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "message": err.Error()})
 		return
 	}
-	span := tx.StartSpan("GainProjection::StorageProcess::GetAllPaginated", "Get a gain-projection paginated", nil)
+	span := tx.StartSpan("GainProjection::ReadingProcess::GetAllPaginated", "Get a gain-projection paginated", nil)
 	resultPaginated, err := h.readingProcess.GetAllPaginated(ctx, *searchParams)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": http.StatusInternalServerError, "message": err.Error()})
@@ -187,4 +188,46 @@ func (h *handler) GetAll(c *gin.Context) {
 	}
 	span.End()
 	c.JSON(http.StatusOK, resultPaginated)
+}
+
+// Create godoc
+// @Summary Realizar uma Receita Prevista
+// @Description Este endpoint permite realizar uma receita que foi prevista
+// @Tags Gain-Projection
+// @Accept json
+// @Produce json
+// @Param id path string true "Id da receita prevista"
+// @Param gain body service.CreateGainRequest true "Modelo de criação da receita"
+// @Param   X-Access-Token	header	string	true	"Token de autenticação do usuário"
+// @Param   X-Userinfo	header	string	true	"Informações do usuário em base64"
+// @Success 200 {object} service.GainResponse
+// @Router /v1/gain-projection/{id}/create-gain [post]
+func (h *handler) CreateGain(c *gin.Context) {
+	ctx := c.Request.Context()
+	tx := apm.TransactionFromContext(ctx)
+
+	id := c.Param("id")
+	var request service.CreateGainRequest
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "message": err.Error()})
+		return
+	}
+	span := tx.StartSpan("GainProjection::StorageProcess::CreateGain", "Create a gain from gain-projection", nil)
+	stat, err := h.storageProcess.CreateGain(ctx, id, request)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"status": http.StatusInternalServerError, "message": err.Error()})
+		tracing.SendSpanErr(span, err)
+		return
+	}
+	if !stat.ProjectionIsFound {
+		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "message": "Gain-projection not found"})
+		return
+	}
+	if stat.ProjectionIsAlreadyDone {
+		c.JSON(http.StatusConflict, gin.H{"status": http.StatusConflict, "message": "A gain is already created"})
+		return
+	}
+	span.End()
+	c.JSON(http.StatusCreated, stat.Gain)
 }

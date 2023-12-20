@@ -9,6 +9,13 @@ definitions:
       id:
         type: integer
     type: object
+  service.CreateGainRequest:
+    properties:
+      pay_in:
+        type: string
+      value:
+        type: number
+    type: object
   service.CreateRequest:
     properties:
       category_id:
@@ -53,6 +60,23 @@ definitions:
         type: string
       recurrence:
         type: integer
+      value:
+        type: number
+    type: object
+  service.GainResponse:
+    properties:
+      category:
+        $ref: '#/definitions/service.CategoryResponse'
+      description:
+        type: string
+      gain_projection_id:
+        type: string
+      id:
+        type: string
+      is_passive:
+        type: boolean
+      pay_in:
+        type: string
       value:
         type: number
     type: object
@@ -125,7 +149,7 @@ paths:
       - application/json
       description: Este endpoint permite criar uma receita prevista
       parameters:
-      - description: Modelo de criação da receita
+      - description: Modelo de criação da receita prevista
         in: body
         name: gain_projection
         required: true
@@ -224,7 +248,7 @@ paths:
       - application/json
       description: Este endpoint permite editar uma receita prevista
       parameters:
-      - description: Modelo de edição da receita
+      - description: Modelo de edição da receita prevista
         in: body
         name: gain_projection
         required: true
@@ -248,6 +272,43 @@ paths:
           schema:
             $ref: '#/definitions/service.GainProjectionResponse'
       summary: Editar uma Receita Prevista
+      tags:
+      - Gain-Projection
+  /v1/gain-projection/{id}/create-gain:
+    post:
+      consumes:
+      - application/json
+      description: Este endpoint permite realizar uma receita que foi prevista
+      parameters:
+      - description: Id da receita prevista
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Modelo de criação da receita
+        in: body
+        name: gain
+        required: true
+        schema:
+          $ref: '#/definitions/service.CreateGainRequest'
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      - description: Informações do usuário em base64
+        in: header
+        name: X-Userinfo
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.GainResponse'
+      summary: Realizar uma Receita Prevista
       tags:
       - Gain-Projection
 swagger: "2.0"

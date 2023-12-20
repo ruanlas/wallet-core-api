@@ -23,7 +23,7 @@ func TestSaveGainProjectionSuccess(t *testing.T) {
 		AddCreatedAt(now).
 		AddPayIn(now).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(GainCategory{Id: 1}).
 		AddDescription("Description de teste").
 		AddValue(500.50).
@@ -34,7 +34,7 @@ func TestSaveGainProjectionSuccess(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
-		INSERT INTO gain_projection (id, created_at, pay_in, description, value, is_passive, is_done, user_id, category_id) 
+		INSERT INTO gain_projection (id, created_at, pay_in, description, value, is_passive, is_already_done, user_id, category_id) 
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).
 		ExpectExec().
 		WithArgs(
@@ -44,7 +44,7 @@ func TestSaveGainProjectionSuccess(t *testing.T) {
 			gainPMock.Description,
 			gainPMock.Value,
 			gainPMock.IsPassive,
-			gainPMock.IsDone,
+			gainPMock.IsAlreadyDone,
 			gainPMock.UserId,
 			gainPMock.Category.Id).
 		WillReturnResult(sqlmock.NewResult(1, 1))
@@ -72,7 +72,7 @@ func TestSaveGainProjectionBeginFail(t *testing.T) {
 		AddCreatedAt(now).
 		AddPayIn(now).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(GainCategory{Id: 1}).
 		AddDescription("Description de teste").
 		AddValue(500.50).
@@ -104,7 +104,7 @@ func TestSaveGainProjectionPrepareFail(t *testing.T) {
 		AddCreatedAt(now).
 		AddPayIn(now).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(GainCategory{Id: 1}).
 		AddDescription("Description de teste").
 		AddValue(500.50).
@@ -115,7 +115,7 @@ func TestSaveGainProjectionPrepareFail(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
-		INSERT INTO gain_projection (id, created_at, pay_in, description, value, is_passive, is_done, user_id, category_id) 
+		INSERT INTO gain_projection (id, created_at, pay_in, description, value, is_passive, is_already_done, user_id, category_id) 
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).
 		WillReturnError(errors.New("An error has been ocurred"))
 
@@ -140,7 +140,7 @@ func TestSaveGainProjectionExecFail(t *testing.T) {
 		AddCreatedAt(now).
 		AddPayIn(now).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(GainCategory{Id: 1}).
 		AddDescription("Description de teste").
 		AddValue(500.50).
@@ -151,7 +151,7 @@ func TestSaveGainProjectionExecFail(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
-		INSERT INTO gain_projection (id, created_at, pay_in, description, value, is_passive, is_done, user_id, category_id) 
+		INSERT INTO gain_projection (id, created_at, pay_in, description, value, is_passive, is_already_done, user_id, category_id) 
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).
 		ExpectExec().
 		WithArgs(
@@ -161,7 +161,7 @@ func TestSaveGainProjectionExecFail(t *testing.T) {
 			gainPMock.Description,
 			gainPMock.Value,
 			gainPMock.IsPassive,
-			gainPMock.IsDone,
+			gainPMock.IsAlreadyDone,
 			gainPMock.UserId,
 			gainPMock.Category.Id).
 		WillReturnError(errors.New("An error has been ocurred"))
@@ -187,7 +187,7 @@ func TestSaveGainProjectionCommitFail(t *testing.T) {
 		AddCreatedAt(now).
 		AddPayIn(now).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(GainCategory{Id: 1}).
 		AddDescription("Description de teste").
 		AddValue(500.50).
@@ -198,7 +198,7 @@ func TestSaveGainProjectionCommitFail(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
-		INSERT INTO gain_projection (id, created_at, pay_in, description, value, is_passive, is_done, user_id, category_id) 
+		INSERT INTO gain_projection (id, created_at, pay_in, description, value, is_passive, is_already_done, user_id, category_id) 
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).
 		ExpectExec().
 		WithArgs(
@@ -208,7 +208,7 @@ func TestSaveGainProjectionCommitFail(t *testing.T) {
 			gainPMock.Description,
 			gainPMock.Value,
 			gainPMock.IsPassive,
-			gainPMock.IsDone,
+			gainPMock.IsAlreadyDone,
 			gainPMock.UserId,
 			gainPMock.Category.Id).
 		WillReturnResult(sqlmock.NewResult(1, 1))

@@ -1,6 +1,6 @@
 USE wallet_core;
 
-INSERT INTO gain_projection(id, created_at, pay_in, description, value, is_done, is_passive, user_id, category_id)
+INSERT INTO gain_projection(id, created_at, pay_in, description, value, is_already_done, is_passive, user_id, category_id)
 VALUES
 ('184375ae-3fd1-4f45-b516-aa6bd512f42e', 1702578712, '2023-12-07 00:00:00', 'Recebimento de salário', '549.98', false, false, 'user 1', 1),
 ('7891d63e-de1e-45d5-b50e-c203985c5e0d', 1702578712, '2023-11-07 00:00:00', 'Recebimento de salário', '549.98', false, false, 'user 1', 1),

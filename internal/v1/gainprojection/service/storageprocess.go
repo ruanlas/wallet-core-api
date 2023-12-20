@@ -12,6 +12,7 @@ type StorageProcess interface {
 	Create(ctx context.Context, request CreateRequest) (*GainProjectionResponse, error)
 	Update(ctx context.Context, id string, request UpdateRequest) (*GainProjectionResponse, error)
 	Delete(ctx context.Context, id string) error
+	CreateGain(ctx context.Context, id string, request CreateGainRequest) (*GainStat, error)
 }
 
 type storageProcess struct {
@@ -30,7 +31,7 @@ func (sp *storageProcess) Create(ctx context.Context, request CreateRequest) (*G
 		AddCreatedAt(createdAt).
 		AddPayIn(request.PayIn).
 		AddIsPassive(request.IsPassive).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(repository.GainCategory{Id: request.CategoryId}).
 		AddDescription(request.Description).
 		AddValue(request.Value).
@@ -73,7 +74,7 @@ func (sp *storageProcess) createRecurrence(ctx context.Context, request CreateRe
 			AddCreatedAt(createdAt).
 			AddPayIn(request.PayIn.AddDate(0, i, 0)).
 			AddIsPassive(request.IsPassive).
-			AddIsDone(false).
+			AddIsAlreadyDone(false).
 			AddCategory(repository.GainCategory{Id: request.CategoryId}).
 			AddDescription(request.Description).
 			AddValue(request.Value).
@@ -89,14 +90,13 @@ func (sp *storageProcess) createRecurrence(ctx context.Context, request CreateRe
 }
 
 func (sp *storageProcess) Update(ctx context.Context, id string, request UpdateRequest) (*GainProjectionResponse, error) {
-	gainProjection := repository.NewGainProjectionBuilder().
+	gainProjectionBuilder := repository.NewGainProjectionBuilder().
 		AddId(id).
 		AddPayIn(request.PayIn).
 		AddIsPassive(request.IsPassive).
 		AddCategory(repository.GainCategory{Id: request.CategoryId}).
 		AddDescription(request.Description).
-		AddValue(request.Value).
-		Build()
+		AddValue(request.Value)
 	gainProjectionExists, err := sp.repository.GetById(ctx, id)
 	if err != nil {
 		return nil, err
@@ -104,7 +104,8 @@ func (sp *storageProcess) Update(ctx context.Context, id string, request UpdateR
 	if gainProjectionExists == nil {
 		return nil, nil
 	}
-	gainProjectionUpdated, err := sp.repository.Edit(ctx, *gainProjection)
+	gainProjectionBuilder.AddIsAlreadyDone(gainProjectionExists.IsAlreadyDone)
+	gainProjectionUpdated, err := sp.repository.Edit(ctx, *gainProjectionBuilder.Build())
 	if err != nil {
 		return nil, err
 	}
@@ -115,15 +116,64 @@ func (sp *storageProcess) Update(ctx context.Context, id string, request UpdateR
 	}
 
 	return NewGainProjectionResponseBuilder().
-		AddId(gainProjection.Id).
-		AddPayIn(gainProjection.PayIn).
-		AddDescription(gainProjection.Description).
-		AddValue(gainProjection.Value).
-		AddIsPassive(gainProjection.IsPassive).
+		AddId(gainProjectionUpdated.Id).
+		AddPayIn(gainProjectionUpdated.PayIn).
+		AddDescription(gainProjectionUpdated.Description).
+		AddValue(gainProjectionUpdated.Value).
+		AddIsPassive(gainProjectionUpdated.IsPassive).
 		AddCategory(CategoryResponse{Id: gainProjectionUpdated.Category.Id, Category: gainProjectionUpdated.Category.Category}).
 		Build(), nil
 }
 
 func (sp *storageProcess) Delete(ctx context.Context, id string) error {
 	return sp.repository.Remove(ctx, id)
+}
+
+func (sp *storageProcess) CreateGain(ctx context.Context, id string, request CreateGainRequest) (*GainStat, error) {
+	gainProjection, err := sp.repository.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if gainProjection == nil {
+		return &GainStat{ProjectionIsFound: false, ProjectionIsAlreadyDone: false}, nil
+	}
+	if gainProjection.IsAlreadyDone == true {
+		return &GainStat{ProjectionIsFound: true, ProjectionIsAlreadyDone: true}, nil
+	}
+	gainBuilder := repository.NewGainBuilder().
+		AddId(sp.generateUUID().String()).
+		AddCategory(gainProjection.Category).
+		AddCreatedAt(time.Now()).
+		AddDescription(gainProjection.Description).
+		AddGainProjectionId(gainProjection.Id).
+		AddIsPassive(gainProjection.IsPassive).
+		AddUserId(gainProjection.UserId).
+		AddValue(gainProjection.Value).
+		AddPayIn(gainProjection.PayIn)
+	if request.Value != 0 {
+		gainBuilder.AddValue(request.Value)
+	}
+	if !request.PayIn.IsZero() {
+		gainBuilder.AddPayIn(request.PayIn)
+	}
+	gain, err := sp.repository.SaveGain(ctx, *gainBuilder.Build())
+	if err != nil {
+		return nil, err
+	}
+	gainProjection.IsAlreadyDone = true
+	_, err = sp.repository.Edit(ctx, *gainProjection)
+	if err != nil {
+		return nil, err
+	}
+
+	gainResponse := NewGainResponseBuilder().
+		AddId(gain.Id).
+		AddGainProjectionId(gain.GainProjectionId).
+		AddPayIn(gain.PayIn).
+		AddDescription(gain.Description).
+		AddValue(gain.Value).
+		AddIsPassive(gain.IsPassive).
+		AddCategory(CategoryResponse{Id: gain.Category.Id, Category: gain.Category.Category}).
+		Build()
+	return &GainStat{ProjectionIsFound: true, ProjectionIsAlreadyDone: false, Gain: gainResponse}, nil
 }

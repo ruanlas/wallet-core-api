@@ -13,6 +13,7 @@ type Repository interface {
 	Remove(ctx context.Context, id string) error
 	GetTotalRecords(ctx context.Context, params QueryParams) (*uint, error)
 	GetAll(ctx context.Context, params QueryParams) (*[]GainProjection, error)
+	SaveGain(ctx context.Context, gain Gain) (*Gain, error)
 }
 
 type repository struct {
@@ -29,7 +30,7 @@ func (r *repository) Save(ctx context.Context, gainProjection GainProjection) (*
 		return nil, err
 	}
 	stmt, err := tx.PrepareContext(ctx, `
-		INSERT INTO gain_projection (id, created_at, pay_in, description, value, is_passive, is_done, user_id, category_id) 
+		INSERT INTO gain_projection (id, created_at, pay_in, description, value, is_passive, is_already_done, user_id, category_id) 
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
 		return nil, err
@@ -42,7 +43,7 @@ func (r *repository) Save(ctx context.Context, gainProjection GainProjection) (*
 		gainProjection.Description,
 		gainProjection.Value,
 		gainProjection.IsPassive,
-		gainProjection.IsDone,
+		gainProjection.IsAlreadyDone,
 		gainProjection.UserId,
 		gainProjection.Category.Id,
 	)
@@ -65,7 +66,7 @@ func (r *repository) GetById(ctx context.Context, id string) (*GainProjection, e
 			gp.description,
 			gp.value,
 			gp.is_passive,
-			gp.is_done,
+			gp.is_already_done,
 			gp.user_id,
 			gc.id,
 			gc.category
@@ -90,7 +91,7 @@ func (r *repository) GetById(ctx context.Context, id string) (*GainProjection, e
 			&gainProjection.Description,
 			&value,
 			&gainProjection.IsPassive,
-			&gainProjection.IsDone,
+			&gainProjection.IsAlreadyDone,
 			&gainProjection.UserId,
 			&categoryId,
 			&gainProjection.Category.Category,
@@ -113,7 +114,7 @@ func (r *repository) Edit(ctx context.Context, gainProjection GainProjection) (*
 		return nil, err
 	}
 	stmt, err := tx.PrepareContext(ctx, `
-		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ? 
+		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_already_done = ? 
 		WHERE id = ?`)
 	if err != nil {
 		return nil, err
@@ -125,6 +126,7 @@ func (r *repository) Edit(ctx context.Context, gainProjection GainProjection) (*
 		gainProjection.Value,
 		gainProjection.IsPassive,
 		gainProjection.Category.Id,
+		gainProjection.IsAlreadyDone,
 		gainProjection.Id,
 	)
 	if err != nil {
@@ -178,7 +180,7 @@ func (r *repository) GetAll(ctx context.Context, params QueryParams) (*[]GainPro
 			gp.description,
 			gp.value,
 			gp.is_passive,
-			gp.is_done,
+			gp.is_already_done,
 			gp.user_id,
 			gc.id,
 			gc.category
@@ -210,7 +212,7 @@ func (r *repository) GetAll(ctx context.Context, params QueryParams) (*[]GainPro
 			&gp.Description,
 			&value,
 			&gp.IsPassive,
-			&gp.IsDone,
+			&gp.IsAlreadyDone,
 			&gp.UserId,
 			&categoryId,
 			&category.Category)
@@ -226,4 +228,37 @@ func (r *repository) GetAll(ctx context.Context, params QueryParams) (*[]GainPro
 	}
 
 	return &gainProjectionList, nil
+}
+
+func (r *repository) SaveGain(ctx context.Context, gain Gain) (*Gain, error) {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	stmt, err := tx.PrepareContext(ctx, `
+		INSERT INTO gain (id, created_at, pay_in, description, value, is_passive, user_id, category_id, gain_projection_id) 
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(
+		gain.Id,
+		gain.CreatedAt.Unix(),
+		gain.PayIn,
+		gain.Description,
+		gain.Value,
+		gain.IsPassive,
+		gain.UserId,
+		gain.Category.Id,
+		gain.GainProjectionId,
+	)
+	if err != nil {
+		return nil, err
+	}
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
+	}
+	return &gain, nil
 }

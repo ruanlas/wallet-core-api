@@ -18,6 +18,7 @@ type mockRepository struct {
 	removeCallsMock          []func(ctx context.Context, id string) error
 	getTotalRecordsCallsMock []func(ctx context.Context, params repository.QueryParams) (*uint, error)
 	getAllCallsMock          []func(ctx context.Context, params repository.QueryParams) (*[]repository.GainProjection, error)
+	saveGainCallsMock        []func(ctx context.Context, gain repository.Gain) (*repository.Gain, error)
 }
 
 func (r *mockRepository) AddSaveCall(
@@ -53,6 +54,12 @@ func (r *mockRepository) AddGetTotalRecordsCalls(
 func (r *mockRepository) AddGetAllCalls(
 	getAll func(ctx context.Context, params repository.QueryParams) (*[]repository.GainProjection, error)) *mockRepository {
 	r.getAllCallsMock = append(r.getAllCallsMock, getAll)
+	return r
+}
+
+func (r *mockRepository) AddSaveGainCalls(
+	saveGain func(ctx context.Context, gain repository.Gain) (*repository.Gain, error)) *mockRepository {
+	r.saveGainCallsMock = append(r.saveGainCallsMock, saveGain)
 	return r
 }
 
@@ -110,6 +117,15 @@ func (r *mockRepository) GetAll(ctx context.Context, params repository.QueryPara
 	return nil, nil
 }
 
+func (r *mockRepository) SaveGain(ctx context.Context, gain repository.Gain) (*repository.Gain, error) {
+	if len(r.saveGainCallsMock) >= 1 {
+		saveGain := r.saveGainCallsMock[0]
+		r.saveGainCallsMock = r.saveGainCallsMock[1:]
+		return saveGain(ctx, gain)
+	}
+	return nil, nil
+}
+
 func TestCreateSuccessWithoutRecurrence(t *testing.T) {
 
 	createdAt := time.Now()
@@ -118,7 +134,7 @@ func TestCreateSuccessWithoutRecurrence(t *testing.T) {
 		AddCreatedAt(createdAt).
 		AddPayIn(createdAt).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(repository.GainCategory{Id: 2, Category: "Salário"}).
 		AddDescription("Description teste").
 		AddValue(750.50).
@@ -160,7 +176,7 @@ func TestCreateSuccessWithRecurrence(t *testing.T) {
 		AddCreatedAt(createdAt).
 		AddPayIn(createdAt).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(repository.GainCategory{Id: 2, Category: "Salário"}).
 		AddDescription("Description teste").
 		AddValue(750.50).
@@ -232,7 +248,7 @@ func TestCreateWithoutRecurrenceGetByIdFail(t *testing.T) {
 		AddCreatedAt(createdAt).
 		AddPayIn(createdAt).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(repository.GainCategory{Id: 2, Category: "Salário"}).
 		AddDescription("Description teste").
 		AddValue(750.50).
@@ -272,7 +288,7 @@ func TestCreateWithRecurrenceSaveFail(t *testing.T) {
 		AddCreatedAt(createdAt).
 		AddPayIn(createdAt).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(repository.GainCategory{Id: 2, Category: "Salário"}).
 		AddDescription("Description teste").
 		AddValue(750.50).
