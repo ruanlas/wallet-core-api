@@ -23,7 +23,7 @@ func TestGetGainProjectionByIdSuccess(t *testing.T) {
 		AddCreatedAt(now).
 		AddPayIn(now).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(GainCategory{Id: 1, Category: "Salário"}).
 		AddDescription("Description de teste").
 		AddValue(500.50).
@@ -37,7 +37,7 @@ func TestGetGainProjectionByIdSuccess(t *testing.T) {
 		"description",
 		"value",
 		"is_passive",
-		"is_done",
+		"is_already_done",
 		"user_id",
 		"category_id",
 		"category",
@@ -48,7 +48,7 @@ func TestGetGainProjectionByIdSuccess(t *testing.T) {
 		gainPMock.Description,
 		gainPMock.Value,
 		gainPMock.IsPassive,
-		gainPMock.IsDone,
+		gainPMock.IsAlreadyDone,
 		gainPMock.UserId,
 		gainPMock.Category.Id,
 		gainPMock.Category.Category,
@@ -64,7 +64,7 @@ func TestGetGainProjectionByIdSuccess(t *testing.T) {
 			gp.description,
 			gp.value,
 			gp.is_passive,
-			gp.is_done,
+			gp.is_already_done,
 			gp.user_id,
 			gc.id,
 			gc.category
@@ -102,7 +102,7 @@ func TestGetGainProjectionByIdQueryFail(t *testing.T) {
 			gp.description,
 			gp.value,
 			gp.is_passive,
-			gp.is_done,
+			gp.is_already_done,
 			gp.user_id,
 			gc.id,
 			gc.category
@@ -136,7 +136,7 @@ func TestGetGainProjectionByIdRowEmpty(t *testing.T) {
 		"description",
 		"value",
 		"is_passive",
-		"is_done",
+		"is_already_done",
 		"user_id",
 		"category_id",
 		"category",
@@ -152,7 +152,7 @@ func TestGetGainProjectionByIdRowEmpty(t *testing.T) {
 			gp.description,
 			gp.value,
 			gp.is_passive,
-			gp.is_done,
+			gp.is_already_done,
 			gp.user_id,
 			gc.id,
 			gc.category
@@ -187,7 +187,7 @@ func TestGetGainProjectionByIdRowScanFail(t *testing.T) {
 		"description",
 		"value",
 		"is_passive",
-		"is_done",
+		"is_already_done",
 		"user_id",
 		"category_id",
 		"category",
@@ -205,7 +205,7 @@ func TestGetGainProjectionByIdRowScanFail(t *testing.T) {
 			gp.description,
 			gp.value,
 			gp.is_passive,
-			gp.is_done,
+			gp.is_already_done,
 			gp.user_id,
 			gc.id,
 			gc.category

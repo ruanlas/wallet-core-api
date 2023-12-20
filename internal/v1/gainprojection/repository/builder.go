@@ -3,15 +3,15 @@ package repository
 import "time"
 
 type GainProjectionBuilder struct {
-	id          string
-	createdAt   time.Time
-	payIn       time.Time
-	description string
-	value       float64
-	isPassive   bool
-	isDone      bool
-	userId      string
-	category    GainCategory
+	id            string
+	createdAt     time.Time
+	payIn         time.Time
+	description   string
+	value         float64
+	isPassive     bool
+	isAlreadyDone bool
+	userId        string
+	category      GainCategory
 }
 
 func NewGainProjectionBuilder() *GainProjectionBuilder {
@@ -41,8 +41,8 @@ func (builder *GainProjectionBuilder) AddIsPassive(isPassive bool) *GainProjecti
 	builder.isPassive = isPassive
 	return builder
 }
-func (builder *GainProjectionBuilder) AddIsDone(isDone bool) *GainProjectionBuilder {
-	builder.isDone = isDone
+func (builder *GainProjectionBuilder) AddIsAlreadyDone(isAlreadyDone bool) *GainProjectionBuilder {
+	builder.isAlreadyDone = isAlreadyDone
 	return builder
 }
 func (builder *GainProjectionBuilder) AddUserId(userId string) *GainProjectionBuilder {
@@ -62,7 +62,7 @@ func (builder *GainProjectionBuilder) Build() *GainProjection {
 	gainProjection.Description = builder.description
 	gainProjection.Value = builder.value
 	gainProjection.IsPassive = builder.isPassive
-	gainProjection.IsDone = builder.isDone
+	gainProjection.IsAlreadyDone = builder.isAlreadyDone
 	gainProjection.UserId = builder.userId
 	gainProjection.Category = builder.category
 

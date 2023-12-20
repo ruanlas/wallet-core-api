@@ -134,7 +134,7 @@ func TestCreateSuccessWithoutRecurrence(t *testing.T) {
 		AddCreatedAt(createdAt).
 		AddPayIn(createdAt).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(repository.GainCategory{Id: 2, Category: "Salário"}).
 		AddDescription("Description teste").
 		AddValue(750.50).
@@ -176,7 +176,7 @@ func TestCreateSuccessWithRecurrence(t *testing.T) {
 		AddCreatedAt(createdAt).
 		AddPayIn(createdAt).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(repository.GainCategory{Id: 2, Category: "Salário"}).
 		AddDescription("Description teste").
 		AddValue(750.50).
@@ -248,7 +248,7 @@ func TestCreateWithoutRecurrenceGetByIdFail(t *testing.T) {
 		AddCreatedAt(createdAt).
 		AddPayIn(createdAt).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(repository.GainCategory{Id: 2, Category: "Salário"}).
 		AddDescription("Description teste").
 		AddValue(750.50).
@@ -288,7 +288,7 @@ func TestCreateWithRecurrenceSaveFail(t *testing.T) {
 		AddCreatedAt(createdAt).
 		AddPayIn(createdAt).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(repository.GainCategory{Id: 2, Category: "Salário"}).
 		AddDescription("Description teste").
 		AddValue(750.50).

@@ -31,7 +31,7 @@ func (sp *storageProcess) Create(ctx context.Context, request CreateRequest) (*G
 		AddCreatedAt(createdAt).
 		AddPayIn(request.PayIn).
 		AddIsPassive(request.IsPassive).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(repository.GainCategory{Id: request.CategoryId}).
 		AddDescription(request.Description).
 		AddValue(request.Value).
@@ -74,7 +74,7 @@ func (sp *storageProcess) createRecurrence(ctx context.Context, request CreateRe
 			AddCreatedAt(createdAt).
 			AddPayIn(request.PayIn.AddDate(0, i, 0)).
 			AddIsPassive(request.IsPassive).
-			AddIsDone(false).
+			AddIsAlreadyDone(false).
 			AddCategory(repository.GainCategory{Id: request.CategoryId}).
 			AddDescription(request.Description).
 			AddValue(request.Value).
@@ -104,7 +104,7 @@ func (sp *storageProcess) Update(ctx context.Context, id string, request UpdateR
 	if gainProjectionExists == nil {
 		return nil, nil
 	}
-	gainProjectionBuilder.AddIsDone(gainProjectionExists.IsDone)
+	gainProjectionBuilder.AddIsAlreadyDone(gainProjectionExists.IsAlreadyDone)
 	gainProjectionUpdated, err := sp.repository.Edit(ctx, *gainProjectionBuilder.Build())
 	if err != nil {
 		return nil, err
@@ -137,7 +137,7 @@ func (sp *storageProcess) CreateGain(ctx context.Context, id string, request Cre
 	if gainProjection == nil {
 		return &GainStat{ProjectionIsFound: false, ProjectionIsAlreadyDone: false}, nil
 	}
-	if gainProjection.IsDone == true {
+	if gainProjection.IsAlreadyDone == true {
 		return &GainStat{ProjectionIsFound: true, ProjectionIsAlreadyDone: true}, nil
 	}
 	gainBuilder := repository.NewGainBuilder().
@@ -160,7 +160,7 @@ func (sp *storageProcess) CreateGain(ctx context.Context, id string, request Cre
 	if err != nil {
 		return nil, err
 	}
-	gainProjection.IsDone = true
+	gainProjection.IsAlreadyDone = true
 	_, err = sp.repository.Edit(ctx, *gainProjection)
 	if err != nil {
 		return nil, err

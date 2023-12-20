@@ -17,7 +17,7 @@ func TestGetAllPaginatedSuccess(t *testing.T) {
 		AddCreatedAt(createdAt).
 		AddPayIn(createdAt).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(repository.GainCategory{Id: 2, Category: "Salário"}).
 		AddDescription("Description teste").
 		AddValue(750.50).

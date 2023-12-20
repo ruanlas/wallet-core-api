@@ -34,7 +34,7 @@ func TestSaveGainSuccess(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
-		INSERT INTO gain_done (id, created_at, pay_in, description, value, is_passive, user_id, category_id, gain_projection_id) 
+		INSERT INTO gain (id, created_at, pay_in, description, value, is_passive, user_id, category_id, gain_projection_id) 
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).
 		ExpectExec().
 		WithArgs(
@@ -115,7 +115,7 @@ func TestSaveGainPrepareFail(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
-		INSERT INTO gain_done (id, created_at, pay_in, description, value, is_passive, user_id, category_id, gain_projection_id) 
+		INSERT INTO gain (id, created_at, pay_in, description, value, is_passive, user_id, category_id, gain_projection_id) 
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).
 		WillReturnError(errors.New("An error has been ocurred"))
 
@@ -151,7 +151,7 @@ func TestSaveGainExecFail(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
-		INSERT INTO gain_done (id, created_at, pay_in, description, value, is_passive, user_id, category_id, gain_projection_id) 
+		INSERT INTO gain (id, created_at, pay_in, description, value, is_passive, user_id, category_id, gain_projection_id) 
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).
 		ExpectExec().
 		WithArgs(
@@ -197,7 +197,7 @@ func TestSaveGainCommitFail(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
-		INSERT INTO gain_done (id, created_at, pay_in, description, value, is_passive, user_id, category_id, gain_projection_id) 
+		INSERT INTO gain (id, created_at, pay_in, description, value, is_passive, user_id, category_id, gain_projection_id) 
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).
 		ExpectExec().
 		WithArgs(

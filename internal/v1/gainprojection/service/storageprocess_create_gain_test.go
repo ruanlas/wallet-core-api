@@ -19,7 +19,7 @@ func TestCreateGainSuccess(t *testing.T) {
 		AddCreatedAt(createdAt).
 		AddPayIn(createdAt).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(repository.GainCategory{Id: 2, Category: "Salário"}).
 		AddDescription("Description teste").
 		AddValue(750.50).
@@ -117,7 +117,7 @@ func TestCreateGainAlreadyDone(t *testing.T) {
 		AddCreatedAt(createdAt).
 		AddPayIn(createdAt).
 		AddIsPassive(true).
-		AddIsDone(true).
+		AddIsAlreadyDone(true).
 		AddCategory(repository.GainCategory{Id: 2, Category: "Salário"}).
 		AddDescription("Description teste").
 		AddValue(750.50).
@@ -153,7 +153,7 @@ func TestCreateGainSaveGainFail(t *testing.T) {
 		AddCreatedAt(createdAt).
 		AddPayIn(createdAt).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(repository.GainCategory{Id: 2, Category: "Salário"}).
 		AddDescription("Description teste").
 		AddValue(750.50).
@@ -190,7 +190,7 @@ func TestCreateGainEditFail(t *testing.T) {
 		AddCreatedAt(createdAt).
 		AddPayIn(createdAt).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(repository.GainCategory{Id: 2, Category: "Salário"}).
 		AddDescription("Description teste").
 		AddValue(750.50).

@@ -22,7 +22,7 @@ func TestEditGainProjectionSuccess(t *testing.T) {
 		AddId("519fd73e-45e6-4471-8a66-5057486f5cc8").
 		AddPayIn(now).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(GainCategory{Id: 1}).
 		AddDescription("Description de teste").
 		AddValue(500.50).
@@ -32,7 +32,7 @@ func TestEditGainProjectionSuccess(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
-		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_done = ? 
+		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_already_done = ? 
 		WHERE id = ?`).
 		ExpectExec().
 		WithArgs(
@@ -41,7 +41,7 @@ func TestEditGainProjectionSuccess(t *testing.T) {
 			gainPMock.Value,
 			gainPMock.IsPassive,
 			gainPMock.Category.Id,
-			gainPMock.IsDone,
+			gainPMock.IsAlreadyDone,
 			gainPMock.Id).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	sqlMock.ExpectCommit()
@@ -68,7 +68,7 @@ func TestEditGainProjectionBeginFail(t *testing.T) {
 		AddCreatedAt(now).
 		AddPayIn(now).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(GainCategory{Id: 1}).
 		AddDescription("Description de teste").
 		AddValue(500.50).
@@ -100,7 +100,7 @@ func TestEditGainProjectionPrepareFail(t *testing.T) {
 		AddCreatedAt(now).
 		AddPayIn(now).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(GainCategory{Id: 1}).
 		AddDescription("Description de teste").
 		AddValue(500.50).
@@ -111,7 +111,7 @@ func TestEditGainProjectionPrepareFail(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
-		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_done = ? 
+		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_already_done = ? 
 		WHERE id = ?`).
 		WillReturnError(errors.New("An error has been ocurred"))
 
@@ -136,7 +136,7 @@ func TestEditGainProjectionExecFail(t *testing.T) {
 		AddCreatedAt(now).
 		AddPayIn(now).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(GainCategory{Id: 1}).
 		AddDescription("Description de teste").
 		AddValue(500.50).
@@ -147,7 +147,7 @@ func TestEditGainProjectionExecFail(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
-		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_done = ? 
+		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_already_done = ? 
 		WHERE id = ?`).
 		ExpectExec().
 		WithArgs(
@@ -156,7 +156,7 @@ func TestEditGainProjectionExecFail(t *testing.T) {
 			gainPMock.Value,
 			gainPMock.IsPassive,
 			gainPMock.Category.Id,
-			gainPMock.IsDone,
+			gainPMock.IsAlreadyDone,
 			gainPMock.Id).
 		WillReturnError(errors.New("An error has been ocurred"))
 
@@ -181,7 +181,7 @@ func TestEditGainProjectionCommitFail(t *testing.T) {
 		AddCreatedAt(now).
 		AddPayIn(now).
 		AddIsPassive(true).
-		AddIsDone(false).
+		AddIsAlreadyDone(false).
 		AddCategory(GainCategory{Id: 1}).
 		AddDescription("Description de teste").
 		AddValue(500.50).
@@ -192,7 +192,7 @@ func TestEditGainProjectionCommitFail(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
-		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_done = ? 
+		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_already_done = ? 
 		WHERE id = ?`).
 		ExpectExec().
 		WithArgs(
@@ -201,7 +201,7 @@ func TestEditGainProjectionCommitFail(t *testing.T) {
 			gainPMock.Value,
 			gainPMock.IsPassive,
 			gainPMock.Category.Id,
-			gainPMock.IsDone,
+			gainPMock.IsAlreadyDone,
 			gainPMock.Id).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	sqlMock.ExpectCommit().WillReturnError(errors.New("An error has been ocurred"))
