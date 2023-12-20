@@ -16,6 +16,7 @@ import (
 type storageProcessMock struct {
 	err      error
 	response *service.GainProjectionResponse
+	gainStat *service.GainStat
 }
 
 func (sp *storageProcessMock) Create(ctx context.Context, request service.CreateRequest) (*service.GainProjectionResponse, error) {
@@ -37,6 +38,13 @@ func (sp *storageProcessMock) Delete(ctx context.Context, id string) error {
 		return sp.err
 	}
 	return nil
+}
+
+func (sp *storageProcessMock) CreateGain(ctx context.Context, id string, request service.CreateGainRequest) (*service.GainStat, error) {
+	if sp.err != nil {
+		return nil, sp.err
+	}
+	return sp.gainStat, nil
 }
 
 type readingProcessMock struct {
@@ -412,4 +420,124 @@ func TestGetAllFail(t *testing.T) {
 	bodyExpected := `{"message":"An error has been ocurred","status":500}`
 	assert.Equal(t, bodyExpected, w.Body.String())
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
+}
+
+func TestCreateGainSuccess(t *testing.T) {
+	_storageProcessMock := &storageProcessMock{
+		gainStat: &service.GainStat{ProjectionIsFound: true, ProjectionIsAlreadyDone: false, Gain: &service.GainResponse{}},
+	}
+
+	handler := NewHandler(_storageProcessMock, nil)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.POST("/gain-projection/:id/create-gain", handler.CreateGain)
+
+	body := []byte(`
+	{
+		"pay_in": "2023-12-30T00:00:00+00:00",
+		"value": 500
+	}`)
+	req, _ := http.NewRequest("POST", "/v1/gain-projection/71e31eb6-dde2-4dcb-b7ef-c7e8a699c628/create-gain", bytes.NewReader(body))
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"id":"","gain_projection_id":"","pay_in":"0001-01-01T00:00:00Z","description":"","value":0,"is_passive":false,"category":{"id":0,"category":""}}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusCreated, w.Code)
+}
+
+func TestCreateGainInvalidBody(t *testing.T) {
+	_storageProcessMock := &storageProcessMock{
+		gainStat: &service.GainStat{ProjectionIsFound: true, ProjectionIsAlreadyDone: false, Gain: &service.GainResponse{}},
+	}
+
+	handler := NewHandler(_storageProcessMock, nil)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.POST("/gain-projection/:id/create-gain", handler.CreateGain)
+
+	body := []byte(`
+	{
+		"pay_in": "2023-12-30T00:00:00+00:00",
+		"value": 500
+	broken`)
+	req, _ := http.NewRequest("POST", "/v1/gain-projection/71e31eb6-dde2-4dcb-b7ef-c7e8a699c628/create-gain", bytes.NewReader(body))
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"message":"invalid character 'b' after object key:value pair","status":400}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestCreateGainFail(t *testing.T) {
+	_storageProcessMock := &storageProcessMock{
+		err: errors.New("An error has been ocurred"),
+	}
+
+	handler := NewHandler(_storageProcessMock, nil)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.POST("/gain-projection/:id/create-gain", handler.CreateGain)
+
+	body := []byte(`
+	{
+		"pay_in": "2023-12-30T00:00:00+00:00",
+		"value": 500
+	}`)
+	req, _ := http.NewRequest("POST", "/v1/gain-projection/71e31eb6-dde2-4dcb-b7ef-c7e8a699c628/create-gain", bytes.NewReader(body))
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"message":"An error has been ocurred","status":500}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+}
+
+func TestCreateGainGainProjectionNotFound(t *testing.T) {
+	_storageProcessMock := &storageProcessMock{
+		gainStat: &service.GainStat{ProjectionIsFound: false, ProjectionIsAlreadyDone: false},
+	}
+
+	handler := NewHandler(_storageProcessMock, nil)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.POST("/gain-projection/:id/create-gain", handler.CreateGain)
+
+	body := []byte(`
+	{
+		"pay_in": "2023-12-30T00:00:00+00:00",
+		"value": 500
+	}`)
+	req, _ := http.NewRequest("POST", "/v1/gain-projection/71e31eb6-dde2-4dcb-b7ef-c7e8a699c628/create-gain", bytes.NewReader(body))
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"message":"Gain-projection not found","status":404}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusNotFound, w.Code)
+}
+
+func TestCreateGainGainProjectionAlreadyIsDone(t *testing.T) {
+	_storageProcessMock := &storageProcessMock{
+		gainStat: &service.GainStat{ProjectionIsFound: true, ProjectionIsAlreadyDone: true},
+	}
+
+	handler := NewHandler(_storageProcessMock, nil)
+	w := httptest.NewRecorder()
+	router := gin.Default()
+	apiRouter := router.Group("/v1")
+	apiRouter.POST("/gain-projection/:id/create-gain", handler.CreateGain)
+
+	body := []byte(`
+	{
+		"pay_in": "2023-12-30T00:00:00+00:00",
+		"value": 500
+	}`)
+	req, _ := http.NewRequest("POST", "/v1/gain-projection/71e31eb6-dde2-4dcb-b7ef-c7e8a699c628/create-gain", bytes.NewReader(body))
+
+	router.ServeHTTP(w, req)
+	bodyExpected := `{"message":"A gain is already created","status":409}`
+	assert.Equal(t, bodyExpected, w.Body.String())
+	assert.Equal(t, http.StatusConflict, w.Code)
 }

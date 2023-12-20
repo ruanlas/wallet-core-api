@@ -45,7 +45,7 @@ Este endpoint permite criar uma receita prevista
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| gain_projection | body | Modelo de criação da receita | Yes | [service.CreateRequest](#servicecreaterequest) |
+| gain_projection | body | Modelo de criação da receita prevista | Yes | [service.CreateRequest](#servicecreaterequest) |
 | X-Access-Token | header | Token de autenticação do usuário | Yes | string |
 | X-Userinfo | header | Informações do usuário em base64 | Yes | string |
 
@@ -116,7 +116,7 @@ Este endpoint permite editar uma receita prevista
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| gain_projection | body | Modelo de edição da receita | Yes | [service.UpdateRequest](#serviceupdaterequest) |
+| gain_projection | body | Modelo de edição da receita prevista | Yes | [service.UpdateRequest](#serviceupdaterequest) |
 | X-Access-Token | header | Token de autenticação do usuário | Yes | string |
 | X-Userinfo | header | Informações do usuário em base64 | Yes | string |
 
@@ -125,6 +125,32 @@ Este endpoint permite editar uma receita prevista
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | OK | [service.GainProjectionResponse](#servicegainprojectionresponse) |
+
+### /v1/gain-projection/{id}/create-gain
+
+#### POST
+##### Summary
+
+Realizar uma Receita Prevista
+
+##### Description
+
+Este endpoint permite realizar uma receita que foi prevista
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| id | path | Id da receita prevista | Yes | string |
+| gain | body | Modelo de criação da receita | Yes | [service.CreateGainRequest](#servicecreategainrequest) |
+| X-Access-Token | header | Token de autenticação do usuário | Yes | string |
+| X-Userinfo | header | Informações do usuário em base64 | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | OK | [service.GainResponse](#servicegainresponse) |
 
 ---
 ### Models
@@ -141,6 +167,13 @@ Este endpoint permite editar uma receita prevista
 | ---- | ---- | ----------- | -------- |
 | category | string |  | No |
 | id | integer |  | No |
+
+#### service.CreateGainRequest
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| pay_in | string |  | No |
+| value | number |  | No |
 
 #### service.CreateRequest
 
@@ -173,6 +206,18 @@ Este endpoint permite editar uma receita prevista
 | is_passive | boolean |  | No |
 | pay_in | string |  | No |
 | recurrence | integer |  | No |
+| value | number |  | No |
+
+#### service.GainResponse
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| category | [service.CategoryResponse](#servicecategoryresponse) |  | No |
+| description | string |  | No |
+| gain_projection_id | string |  | No |
+| id | string |  | No |
+| is_passive | boolean |  | No |
+| pay_in | string |  | No |
 | value | number |  | No |
 
 #### service.UpdateRequest

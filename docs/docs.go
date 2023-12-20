@@ -102,7 +102,7 @@ var doc = `{
                 "summary": "Criar uma Receita Prevista",
                 "parameters": [
                     {
-                        "description": "Modelo de criação da receita",
+                        "description": "Modelo de criação da receita prevista",
                         "name": "gain_projection",
                         "in": "body",
                         "required": true,
@@ -194,7 +194,7 @@ var doc = `{
                 "summary": "Editar uma Receita Prevista",
                 "parameters": [
                     {
-                        "description": "Modelo de edição da receita",
+                        "description": "Modelo de edição da receita prevista",
                         "name": "gain_projection",
                         "in": "body",
                         "required": true,
@@ -285,6 +285,61 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/v1/gain-projection/{id}/create-gain": {
+            "post": {
+                "description": "Este endpoint permite realizar uma receita que foi prevista",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Gain-Projection"
+                ],
+                "summary": "Realizar uma Receita Prevista",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id da receita prevista",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Modelo de criação da receita",
+                        "name": "gain",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.CreateGainRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Informações do usuário em base64",
+                        "name": "X-Userinfo",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.GainResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -299,6 +354,17 @@ var doc = `{
                 },
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "service.CreateGainRequest": {
+            "type": "object",
+            "properties": {
+                "pay_in": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
                 }
             }
         },
@@ -368,6 +434,32 @@ var doc = `{
                 },
                 "recurrence": {
                     "type": "integer"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "service.GainResponse": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "$ref": "#/definitions/service.CategoryResponse"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "gain_projection_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_passive": {
+                    "type": "boolean"
+                },
+                "pay_in": {
+                    "type": "string"
                 },
                 "value": {
                     "type": "number"

@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestEditGainProjectionSuccess(t *testing.T) {
+func TestSaveGainSuccess(t *testing.T) {
 	dbMock, sqlMock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -18,44 +18,48 @@ func TestEditGainProjectionSuccess(t *testing.T) {
 	defer dbMock.Close()
 
 	now := time.Now()
-	gainPMock := NewGainProjectionBuilder().
+	gainMock := NewGainBuilder().
 		AddId("519fd73e-45e6-4471-8a66-5057486f5cc8").
+		AddCreatedAt(now).
 		AddPayIn(now).
 		AddIsPassive(true).
-		AddIsDone(false).
 		AddCategory(GainCategory{Id: 1}).
 		AddDescription("Description de teste").
 		AddValue(500.50).
+		AddUserId("User1").
+		AddGainProjectionId("7a494375-53a1-41e4-a9db-6bb30eaf23c2").
 		Build()
 
 	_repository := New(dbMock)
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
-		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_done = ? 
-		WHERE id = ?`).
+		INSERT INTO gain_done (id, created_at, pay_in, description, value, is_passive, user_id, category_id, gain_projection_id) 
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).
 		ExpectExec().
 		WithArgs(
-			gainPMock.PayIn,
-			gainPMock.Description,
-			gainPMock.Value,
-			gainPMock.IsPassive,
-			gainPMock.Category.Id,
-			gainPMock.IsDone,
-			gainPMock.Id).
+			gainMock.Id,
+			gainMock.CreatedAt.Unix(),
+			gainMock.PayIn,
+			gainMock.Description,
+			gainMock.Value,
+			gainMock.IsPassive,
+			gainMock.UserId,
+			gainMock.Category.Id,
+			gainMock.GainProjectionId).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	sqlMock.ExpectCommit()
 
-	gainPEdited, err := _repository.Edit(context.Background(), *gainPMock)
+	gainSaved, err := _repository.SaveGain(context.Background(), *gainMock)
 	assert.NoError(t, err)
-	assert.Equal(t, "519fd73e-45e6-4471-8a66-5057486f5cc8", gainPEdited.Id)
+	assert.Equal(t, "519fd73e-45e6-4471-8a66-5057486f5cc8", gainSaved.Id)
 
 	if err := sqlMock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 }
 
-func TestEditGainProjectionBeginFail(t *testing.T) {
+func TestSaveGainBeginFail(t *testing.T) {
 	dbMock, sqlMock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -63,23 +67,23 @@ func TestEditGainProjectionBeginFail(t *testing.T) {
 	defer dbMock.Close()
 
 	now := time.Now()
-	gainPMock := NewGainProjectionBuilder().
+	gainMock := NewGainBuilder().
 		AddId("519fd73e-45e6-4471-8a66-5057486f5cc8").
 		AddCreatedAt(now).
 		AddPayIn(now).
 		AddIsPassive(true).
-		AddIsDone(false).
 		AddCategory(GainCategory{Id: 1}).
 		AddDescription("Description de teste").
 		AddValue(500.50).
 		AddUserId("User1").
+		AddGainProjectionId("7a494375-53a1-41e4-a9db-6bb30eaf23c2").
 		Build()
 
 	_repository := New(dbMock)
 
 	sqlMock.ExpectBegin().WillReturnError(errors.New("An error has been ocurred"))
 
-	_, err = _repository.Edit(context.Background(), *gainPMock)
+	_, err = _repository.SaveGain(context.Background(), *gainMock)
 	assert.Error(t, err)
 
 	if err := sqlMock.ExpectationsWereMet(); err != nil {
@@ -87,7 +91,7 @@ func TestEditGainProjectionBeginFail(t *testing.T) {
 	}
 }
 
-func TestEditGainProjectionPrepareFail(t *testing.T) {
+func TestSaveGainPrepareFail(t *testing.T) {
 	dbMock, sqlMock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -95,27 +99,27 @@ func TestEditGainProjectionPrepareFail(t *testing.T) {
 	defer dbMock.Close()
 
 	now := time.Now()
-	gainPMock := NewGainProjectionBuilder().
+	gainMock := NewGainBuilder().
 		AddId("519fd73e-45e6-4471-8a66-5057486f5cc8").
 		AddCreatedAt(now).
 		AddPayIn(now).
 		AddIsPassive(true).
-		AddIsDone(false).
 		AddCategory(GainCategory{Id: 1}).
 		AddDescription("Description de teste").
 		AddValue(500.50).
 		AddUserId("User1").
+		AddGainProjectionId("7a494375-53a1-41e4-a9db-6bb30eaf23c2").
 		Build()
 
 	_repository := New(dbMock)
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
-		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_done = ? 
-		WHERE id = ?`).
+		INSERT INTO gain_done (id, created_at, pay_in, description, value, is_passive, user_id, category_id, gain_projection_id) 
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).
 		WillReturnError(errors.New("An error has been ocurred"))
 
-	_, err = _repository.Edit(context.Background(), *gainPMock)
+	_, err = _repository.SaveGain(context.Background(), *gainMock)
 	assert.Error(t, err)
 
 	if err := sqlMock.ExpectationsWereMet(); err != nil {
@@ -123,7 +127,7 @@ func TestEditGainProjectionPrepareFail(t *testing.T) {
 	}
 }
 
-func TestEditGainProjectionExecFail(t *testing.T) {
+func TestSaveGainExecFail(t *testing.T) {
 	dbMock, sqlMock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -131,36 +135,38 @@ func TestEditGainProjectionExecFail(t *testing.T) {
 	defer dbMock.Close()
 
 	now := time.Now()
-	gainPMock := NewGainProjectionBuilder().
+	gainMock := NewGainBuilder().
 		AddId("519fd73e-45e6-4471-8a66-5057486f5cc8").
 		AddCreatedAt(now).
 		AddPayIn(now).
 		AddIsPassive(true).
-		AddIsDone(false).
 		AddCategory(GainCategory{Id: 1}).
 		AddDescription("Description de teste").
 		AddValue(500.50).
 		AddUserId("User1").
+		AddGainProjectionId("7a494375-53a1-41e4-a9db-6bb30eaf23c2").
 		Build()
 
 	_repository := New(dbMock)
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
-		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_done = ? 
-		WHERE id = ?`).
+		INSERT INTO gain_done (id, created_at, pay_in, description, value, is_passive, user_id, category_id, gain_projection_id) 
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).
 		ExpectExec().
 		WithArgs(
-			gainPMock.PayIn,
-			gainPMock.Description,
-			gainPMock.Value,
-			gainPMock.IsPassive,
-			gainPMock.Category.Id,
-			gainPMock.IsDone,
-			gainPMock.Id).
+			gainMock.Id,
+			gainMock.CreatedAt.Unix(),
+			gainMock.PayIn,
+			gainMock.Description,
+			gainMock.Value,
+			gainMock.IsPassive,
+			gainMock.UserId,
+			gainMock.Category.Id,
+			gainMock.GainProjectionId).
 		WillReturnError(errors.New("An error has been ocurred"))
 
-	_, err = _repository.Edit(context.Background(), *gainPMock)
+	_, err = _repository.SaveGain(context.Background(), *gainMock)
 	assert.Error(t, err)
 
 	if err := sqlMock.ExpectationsWereMet(); err != nil {
@@ -168,7 +174,7 @@ func TestEditGainProjectionExecFail(t *testing.T) {
 	}
 }
 
-func TestEditGainProjectionCommitFail(t *testing.T) {
+func TestSaveGainCommitFail(t *testing.T) {
 	dbMock, sqlMock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -176,37 +182,38 @@ func TestEditGainProjectionCommitFail(t *testing.T) {
 	defer dbMock.Close()
 
 	now := time.Now()
-	gainPMock := NewGainProjectionBuilder().
+	gainMock := NewGainBuilder().
 		AddId("519fd73e-45e6-4471-8a66-5057486f5cc8").
 		AddCreatedAt(now).
 		AddPayIn(now).
 		AddIsPassive(true).
-		AddIsDone(false).
 		AddCategory(GainCategory{Id: 1}).
 		AddDescription("Description de teste").
 		AddValue(500.50).
 		AddUserId("User1").
+		AddGainProjectionId("7a494375-53a1-41e4-a9db-6bb30eaf23c2").
 		Build()
-
 	_repository := New(dbMock)
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
-		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_done = ? 
-		WHERE id = ?`).
+		INSERT INTO gain_done (id, created_at, pay_in, description, value, is_passive, user_id, category_id, gain_projection_id) 
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).
 		ExpectExec().
 		WithArgs(
-			gainPMock.PayIn,
-			gainPMock.Description,
-			gainPMock.Value,
-			gainPMock.IsPassive,
-			gainPMock.Category.Id,
-			gainPMock.IsDone,
-			gainPMock.Id).
+			gainMock.Id,
+			gainMock.CreatedAt.Unix(),
+			gainMock.PayIn,
+			gainMock.Description,
+			gainMock.Value,
+			gainMock.IsPassive,
+			gainMock.UserId,
+			gainMock.Category.Id,
+			gainMock.GainProjectionId).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	sqlMock.ExpectCommit().WillReturnError(errors.New("An error has been ocurred"))
 
-	_, err = _repository.Edit(context.Background(), *gainPMock)
+	_, err = _repository.SaveGain(context.Background(), *gainMock)
 	assert.Error(t, err)
 
 	if err := sqlMock.ExpectationsWereMet(); err != nil {
