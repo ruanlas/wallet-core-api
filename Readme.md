@@ -82,7 +82,7 @@ $ curl --location '{keycloak-host}/realms/wallet/protocol/openid-connect/token' 
 ```
 Para atualizar o token basta fazer outra chamada para o mesmo endpoint. Segue abaixo um exemplo de chamada por `curl` para atualizar o token:
 ```bash
-$ curl --location 'http://localhost:8081/realms/master/protocol/openid-connect/token' \
+$ curl --location '{keycloak-host}/realms/master/protocol/openid-connect/token' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data-urlencode 'grant_type=refresh_token' \
 --data-urlencode 'client_id={client_id}' \
