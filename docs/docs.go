@@ -70,13 +70,6 @@ var doc = `{
                         "name": "X-Access-Token",
                         "in": "header",
                         "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Informações do usuário em base64",
-                        "name": "X-Userinfo",
-                        "in": "header",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -114,13 +107,6 @@ var doc = `{
                         "type": "string",
                         "description": "Token de autenticação do usuário",
                         "name": "X-Access-Token",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Informações do usuário em base64",
-                        "name": "X-Userinfo",
                         "in": "header",
                         "required": true
                     }
@@ -162,13 +148,6 @@ var doc = `{
                         "name": "X-Access-Token",
                         "in": "header",
                         "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Informações do usuário em base64",
-                        "name": "X-Userinfo",
-                        "in": "header",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -208,13 +187,6 @@ var doc = `{
                         "name": "X-Access-Token",
                         "in": "header",
                         "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Informações do usuário em base64",
-                        "name": "X-Userinfo",
-                        "in": "header",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -250,13 +222,6 @@ var doc = `{
                         "type": "string",
                         "description": "Token de autenticação do usuário",
                         "name": "X-Access-Token",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Informações do usuário em base64",
-                        "name": "X-Userinfo",
                         "in": "header",
                         "required": true
                     }
@@ -320,13 +285,6 @@ var doc = `{
                         "type": "string",
                         "description": "Token de autenticação do usuário",
                         "name": "X-Access-Token",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Informações do usuário em base64",
-                        "name": "X-Userinfo",
                         "in": "header",
                         "required": true
                     }
