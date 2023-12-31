@@ -72,11 +72,11 @@ func TestGetGainProjectionByIdSuccess(t *testing.T) {
 			gain_projection gp
 		INNER JOIN gain_category gc ON 
 			gc.id = gp.category_id
-		WHERE gp.id = ?`).
-		WithArgs("519fd73e-45e6-4471-8a66-5057486f5cc8").
+		WHERE gp.id = ? AND gp.user_id = ?`).
+		WithArgs("519fd73e-45e6-4471-8a66-5057486f5cc8", "User1").
 		WillReturnRows(rowsGainProjectionMock)
 
-	gainPSaved, err := _repository.GetById(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8")
+	gainPSaved, err := _repository.GetById(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8", "User1")
 	assert.NoError(t, err)
 	assert.Equal(t, "519fd73e-45e6-4471-8a66-5057486f5cc8", gainPSaved.Id)
 
@@ -110,11 +110,11 @@ func TestGetGainProjectionByIdQueryFail(t *testing.T) {
 			gain_projection gp
 		INNER JOIN gain_category gc ON 
 			gc.id = gp.category_id
-		WHERE gp.id = ?`).
-		WithArgs("519fd73e-45e6-4471-8a66-5057486f5cc8").
+		WHERE gp.id = ? AND gp.user_id = ?`).
+		WithArgs("519fd73e-45e6-4471-8a66-5057486f5cc8", "User1").
 		WillReturnError(errors.New("An error has been ocurred"))
 
-	_, err = _repository.GetById(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8")
+	_, err = _repository.GetById(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8", "User1")
 	assert.Error(t, err)
 
 	if err := sqlMock.ExpectationsWereMet(); err != nil {
@@ -160,11 +160,11 @@ func TestGetGainProjectionByIdRowEmpty(t *testing.T) {
 			gain_projection gp
 		INNER JOIN gain_category gc ON 
 			gc.id = gp.category_id
-		WHERE gp.id = ?`).
-		WithArgs("519fd73e-45e6-4471-8a66-5057486f5cc8").
+		WHERE gp.id = ? AND gp.user_id = ?`).
+		WithArgs("519fd73e-45e6-4471-8a66-5057486f5cc8", "User1").
 		WillReturnRows(rowsGainProjectionMock)
 
-	gainPSaved, err := _repository.GetById(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8")
+	gainPSaved, err := _repository.GetById(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8", "User1")
 	assert.NoError(t, err)
 	assert.Empty(t, gainPSaved)
 
@@ -213,11 +213,11 @@ func TestGetGainProjectionByIdRowScanFail(t *testing.T) {
 			gain_projection gp
 		INNER JOIN gain_category gc ON 
 			gc.id = gp.category_id
-		WHERE gp.id = ?`).
-		WithArgs("519fd73e-45e6-4471-8a66-5057486f5cc8").
+		WHERE gp.id = ? AND gp.user_id = ?`).
+		WithArgs("519fd73e-45e6-4471-8a66-5057486f5cc8", "User1").
 		WillReturnRows(rowsGainProjectionMock)
 
-	_, err = _repository.GetById(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8")
+	_, err = _repository.GetById(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8", "User1")
 	assert.Error(t, err)
 
 	if err := sqlMock.ExpectationsWereMet(); err != nil {

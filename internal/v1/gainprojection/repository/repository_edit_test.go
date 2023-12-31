@@ -33,7 +33,7 @@ func TestEditGainProjectionSuccess(t *testing.T) {
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
 		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_already_done = ? 
-		WHERE id = ?`).
+		WHERE id = ? AND user_id = ?`).
 		ExpectExec().
 		WithArgs(
 			gainPMock.PayIn,
@@ -42,7 +42,8 @@ func TestEditGainProjectionSuccess(t *testing.T) {
 			gainPMock.IsPassive,
 			gainPMock.Category.Id,
 			gainPMock.IsAlreadyDone,
-			gainPMock.Id).
+			gainPMock.Id,
+			gainPMock.UserId).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	sqlMock.ExpectCommit()
 
@@ -112,7 +113,7 @@ func TestEditGainProjectionPrepareFail(t *testing.T) {
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
 		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_already_done = ? 
-		WHERE id = ?`).
+		WHERE id = ? AND user_id = ?`).
 		WillReturnError(errors.New("An error has been ocurred"))
 
 	_, err = _repository.Edit(context.Background(), *gainPMock)
@@ -148,7 +149,7 @@ func TestEditGainProjectionExecFail(t *testing.T) {
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
 		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_already_done = ? 
-		WHERE id = ?`).
+		WHERE id = ? AND user_id = ?`).
 		ExpectExec().
 		WithArgs(
 			gainPMock.PayIn,
@@ -157,7 +158,8 @@ func TestEditGainProjectionExecFail(t *testing.T) {
 			gainPMock.IsPassive,
 			gainPMock.Category.Id,
 			gainPMock.IsAlreadyDone,
-			gainPMock.Id).
+			gainPMock.Id,
+			gainPMock.UserId).
 		WillReturnError(errors.New("An error has been ocurred"))
 
 	_, err = _repository.Edit(context.Background(), *gainPMock)
@@ -193,7 +195,7 @@ func TestEditGainProjectionCommitFail(t *testing.T) {
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectPrepare(`
 		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_already_done = ? 
-		WHERE id = ?`).
+		WHERE id = ? AND user_id = ?`).
 		ExpectExec().
 		WithArgs(
 			gainPMock.PayIn,
@@ -202,7 +204,8 @@ func TestEditGainProjectionCommitFail(t *testing.T) {
 			gainPMock.IsPassive,
 			gainPMock.Category.Id,
 			gainPMock.IsAlreadyDone,
-			gainPMock.Id).
+			gainPMock.Id,
+			gainPMock.UserId).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	sqlMock.ExpectCommit().WillReturnError(errors.New("An error has been ocurred"))
 

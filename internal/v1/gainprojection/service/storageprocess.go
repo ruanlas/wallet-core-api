@@ -4,15 +4,16 @@ import (
 	"context"
 	"time"
 
+	"github.com/ruanlas/wallet-core-api/internal/idpauth"
 	"github.com/ruanlas/wallet-core-api/internal/v1/gainprojection/repository"
 	uuid "github.com/satori/go.uuid"
 )
 
 type StorageProcess interface {
-	Create(ctx context.Context, request CreateRequest) (*GainProjectionResponse, error)
-	Update(ctx context.Context, id string, request UpdateRequest) (*GainProjectionResponse, error)
-	Delete(ctx context.Context, id string) error
-	CreateGain(ctx context.Context, id string, request CreateGainRequest) (*GainStat, error)
+	Create(createCtx CreateContext) (*GainProjectionResponse, error)
+	Update(updateCtx UpdateContext) (*GainProjectionResponse, error)
+	Delete(searchCtx SearchContext) error
+	CreateGain(createGainCtx CreateGainContext) (*GainStat, error)
 }
 
 type storageProcess struct {
@@ -24,7 +25,9 @@ func NewStorageProcess(repository repository.Repository, generateUUID func() uui
 	return &storageProcess{repository: repository, generateUUID: generateUUID}
 }
 
-func (sp *storageProcess) Create(ctx context.Context, request CreateRequest) (*GainProjectionResponse, error) {
+func (sp *storageProcess) Create(createCtx CreateContext) (*GainProjectionResponse, error) {
+	request := createCtx.Request
+	user := idpauth.GetUser(createCtx.UserToken)
 	createdAt := time.Now()
 	gainProjection := repository.NewGainProjectionBuilder().
 		AddId(sp.generateUUID().String()).
@@ -35,23 +38,23 @@ func (sp *storageProcess) Create(ctx context.Context, request CreateRequest) (*G
 		AddCategory(repository.GainCategory{Id: request.CategoryId}).
 		AddDescription(request.Description).
 		AddValue(request.Value).
-		AddUserId("User1").
+		AddUserId(user.Id).
 		Build()
 
-	gainProjectionSaved, err := sp.repository.Save(ctx, *gainProjection)
+	gainProjectionSaved, err := sp.repository.Save(createCtx.Ctx, *gainProjection)
 	if err != nil {
 		return nil, err
 	}
 
 	if request.Recurrence > 1 {
-		err = sp.createRecurrence(ctx, request, createdAt)
+		err = sp.createRecurrence(createCtx.Ctx, request, createdAt, user.Id)
 		if err != nil {
 			return nil, err
 		}
 	} else {
 		request.Recurrence = 1
 	}
-	gainProjectionSaved, err = sp.repository.GetById(ctx, gainProjectionSaved.Id)
+	gainProjectionSaved, err = sp.repository.GetById(createCtx.Ctx, gainProjectionSaved.Id, user.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +70,7 @@ func (sp *storageProcess) Create(ctx context.Context, request CreateRequest) (*G
 		Build(), nil
 }
 
-func (sp *storageProcess) createRecurrence(ctx context.Context, request CreateRequest, createdAt time.Time) error {
+func (sp *storageProcess) createRecurrence(ctx context.Context, request CreateRequest, createdAt time.Time, userId string) error {
 	for i := 1; i < int(request.Recurrence+1); i++ {
 		gainProjection := repository.NewGainProjectionBuilder().
 			AddId(sp.generateUUID().String()).
@@ -78,7 +81,7 @@ func (sp *storageProcess) createRecurrence(ctx context.Context, request CreateRe
 			AddCategory(repository.GainCategory{Id: request.CategoryId}).
 			AddDescription(request.Description).
 			AddValue(request.Value).
-			AddUserId("User1").
+			AddUserId(userId).
 			Build()
 
 		_, err := sp.repository.Save(ctx, *gainProjection)
@@ -89,15 +92,17 @@ func (sp *storageProcess) createRecurrence(ctx context.Context, request CreateRe
 	return nil
 }
 
-func (sp *storageProcess) Update(ctx context.Context, id string, request UpdateRequest) (*GainProjectionResponse, error) {
+func (sp *storageProcess) Update(updateCtx UpdateContext) (*GainProjectionResponse, error) {
+	request := updateCtx.Request
+	user := idpauth.GetUser(updateCtx.UserToken)
 	gainProjectionBuilder := repository.NewGainProjectionBuilder().
-		AddId(id).
+		AddId(updateCtx.Id).
 		AddPayIn(request.PayIn).
 		AddIsPassive(request.IsPassive).
 		AddCategory(repository.GainCategory{Id: request.CategoryId}).
 		AddDescription(request.Description).
 		AddValue(request.Value)
-	gainProjectionExists, err := sp.repository.GetById(ctx, id)
+	gainProjectionExists, err := sp.repository.GetById(updateCtx.Ctx, updateCtx.Id, user.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -105,12 +110,13 @@ func (sp *storageProcess) Update(ctx context.Context, id string, request UpdateR
 		return nil, nil
 	}
 	gainProjectionBuilder.AddIsAlreadyDone(gainProjectionExists.IsAlreadyDone)
-	gainProjectionUpdated, err := sp.repository.Edit(ctx, *gainProjectionBuilder.Build())
+	gainProjectionBuilder.AddUserId(user.Id)
+	gainProjectionUpdated, err := sp.repository.Edit(updateCtx.Ctx, *gainProjectionBuilder.Build())
 	if err != nil {
 		return nil, err
 	}
 
-	gainProjectionUpdated, err = sp.repository.GetById(ctx, gainProjectionUpdated.Id)
+	gainProjectionUpdated, err = sp.repository.GetById(updateCtx.Ctx, gainProjectionUpdated.Id, user.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -125,12 +131,15 @@ func (sp *storageProcess) Update(ctx context.Context, id string, request UpdateR
 		Build(), nil
 }
 
-func (sp *storageProcess) Delete(ctx context.Context, id string) error {
-	return sp.repository.Remove(ctx, id)
+func (sp *storageProcess) Delete(searchCtx SearchContext) error {
+	user := idpauth.GetUser(searchCtx.UserToken)
+	return sp.repository.Remove(searchCtx.Ctx, searchCtx.Id, user.Id)
 }
 
-func (sp *storageProcess) CreateGain(ctx context.Context, id string, request CreateGainRequest) (*GainStat, error) {
-	gainProjection, err := sp.repository.GetById(ctx, id)
+func (sp *storageProcess) CreateGain(createGainCtx CreateGainContext) (*GainStat, error) {
+	request := createGainCtx.Request
+	user := idpauth.GetUser(createGainCtx.UserToken)
+	gainProjection, err := sp.repository.GetById(createGainCtx.Ctx, createGainCtx.Id, user.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -156,12 +165,12 @@ func (sp *storageProcess) CreateGain(ctx context.Context, id string, request Cre
 	if !request.PayIn.IsZero() {
 		gainBuilder.AddPayIn(request.PayIn)
 	}
-	gain, err := sp.repository.SaveGain(ctx, *gainBuilder.Build())
+	gain, err := sp.repository.SaveGain(createGainCtx.Ctx, *gainBuilder.Build())
 	if err != nil {
 		return nil, err
 	}
 	gainProjection.IsAlreadyDone = true
-	_, err = sp.repository.Edit(ctx, *gainProjection)
+	_, err = sp.repository.Edit(createGainCtx.Ctx, *gainProjection)
 	if err != nil {
 		return nil, err
 	}

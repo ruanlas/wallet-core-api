@@ -19,13 +19,13 @@ func TestRemoveGainProjectionSuccess(t *testing.T) {
 	_repository := New(dbMock)
 
 	sqlMock.ExpectBegin()
-	sqlMock.ExpectPrepare(`DELETE FROM gain_projection WHERE id = ?`).
+	sqlMock.ExpectPrepare(`DELETE FROM gain_projection WHERE id = ? AND user_id = ?`).
 		ExpectExec().
-		WithArgs("519fd73e-45e6-4471-8a66-5057486f5cc8").
+		WithArgs("519fd73e-45e6-4471-8a66-5057486f5cc8", "User1").
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	sqlMock.ExpectCommit()
 
-	err = _repository.Remove(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8")
+	err = _repository.Remove(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8", "User1")
 	assert.NoError(t, err)
 
 	if err := sqlMock.ExpectationsWereMet(); err != nil {
@@ -44,7 +44,7 @@ func TestRemoveGainProjectionBeginFail(t *testing.T) {
 
 	sqlMock.ExpectBegin().WillReturnError(errors.New("An error has been ocurred"))
 
-	err = _repository.Remove(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8")
+	err = _repository.Remove(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8", "User1")
 	assert.Error(t, err)
 
 	if err := sqlMock.ExpectationsWereMet(); err != nil {
@@ -62,10 +62,10 @@ func TestRemoveGainProjectionPrepareFail(t *testing.T) {
 	_repository := New(dbMock)
 
 	sqlMock.ExpectBegin()
-	sqlMock.ExpectPrepare(`DELETE FROM gain_projection WHERE id = ?`).
+	sqlMock.ExpectPrepare(`DELETE FROM gain_projection WHERE id = ? AND user_id = ?`).
 		WillReturnError(errors.New("An error has been ocurred"))
 
-	err = _repository.Remove(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8")
+	err = _repository.Remove(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8", "User1")
 	assert.Error(t, err)
 
 	if err := sqlMock.ExpectationsWereMet(); err != nil {
@@ -83,12 +83,12 @@ func TestRemoveGainProjectionExecFail(t *testing.T) {
 	_repository := New(dbMock)
 
 	sqlMock.ExpectBegin()
-	sqlMock.ExpectPrepare(`DELETE FROM gain_projection WHERE id = ?`).
+	sqlMock.ExpectPrepare(`DELETE FROM gain_projection WHERE id = ? AND user_id = ?`).
 		ExpectExec().
-		WithArgs("519fd73e-45e6-4471-8a66-5057486f5cc8").
+		WithArgs("519fd73e-45e6-4471-8a66-5057486f5cc8", "User1").
 		WillReturnError(errors.New("An error has been ocurred"))
 
-	err = _repository.Remove(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8")
+	err = _repository.Remove(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8", "User1")
 	assert.Error(t, err)
 
 	if err := sqlMock.ExpectationsWereMet(); err != nil {
@@ -106,14 +106,14 @@ func TestRemoveGainProjectionCommitFail(t *testing.T) {
 	_repository := New(dbMock)
 
 	sqlMock.ExpectBegin()
-	sqlMock.ExpectPrepare(`DELETE FROM gain_projection WHERE id = ?`).
+	sqlMock.ExpectPrepare(`DELETE FROM gain_projection WHERE id = ? AND user_id = ?`).
 		ExpectExec().
-		WithArgs("519fd73e-45e6-4471-8a66-5057486f5cc8").
+		WithArgs("519fd73e-45e6-4471-8a66-5057486f5cc8", "User1").
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	sqlMock.ExpectCommit().
 		WillReturnError(errors.New("An error has been ocurred"))
 
-	err = _repository.Remove(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8")
+	err = _repository.Remove(context.Background(), "519fd73e-45e6-4471-8a66-5057486f5cc8", "User1")
 	assert.Error(t, err)
 
 	if err := sqlMock.ExpectationsWereMet(); err != nil {

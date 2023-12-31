@@ -70,6 +70,7 @@ func (builder *GainProjectionBuilder) Build() *GainProjection {
 }
 
 type QueryParamsBuilder struct {
+	userId string
 	limit  uint
 	offset uint
 	month  uint
@@ -81,6 +82,10 @@ func NewQueryParamsBuilder() *QueryParamsBuilder {
 }
 func (builder *QueryParamsBuilder) AddMonth(month uint) *QueryParamsBuilder {
 	builder.month = month
+	return builder
+}
+func (builder *QueryParamsBuilder) AddUserId(userId string) *QueryParamsBuilder {
+	builder.userId = userId
 	return builder
 }
 func (builder *QueryParamsBuilder) AddYear(year uint) *QueryParamsBuilder {
@@ -97,6 +102,7 @@ func (builder *QueryParamsBuilder) AddOffset(offset uint) *QueryParamsBuilder {
 }
 func (builder *QueryParamsBuilder) Build() QueryParams {
 	return QueryParams{
+		userId: builder.userId,
 		month:  builder.month,
 		year:   builder.year,
 		limit:  builder.limit,

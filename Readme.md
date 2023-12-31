@@ -12,6 +12,8 @@ Ele permitirá lançar projeções de receitas e gastos, além de permitir lanç
    * [Pré-requisitos](#pré-requisitos)
    * [Ambiente de desenvolvimento](#ambiente-de-desenvolvimento)
       * [Comandos úteis](#comandos-úteis)
+      * [Obtendo o token do usuário](#obtendo-o-token-do-usuário)
+         * [Autenticando na API do keycloak](#autenticando-na-api-do-keycloak)
    * [Documentação](#documentação)
    * [Monitoramento](#monitoramento)
    * [Variáveis de ambiente](#variáveis-de-ambiente)
@@ -58,6 +60,35 @@ Carrega o banco de dados com dados fakes:
 ```bash
 $ make dev-datafake-load
 ```
+
+### Obtendo o token do usuário
+Para utilizar esta API é necessário possuir um token válido. O token pode ser obtido de duas formas:
+ 1) Fazendo uma autenticação por oauth2 no keycloak e obter o token
+ 2) Se autenticar na API do keycloak e obter o token válido
+
+#### Autenticando na API do keycloak
+Para autenticar na API do keycloak, é necessário fazer uma chamada `POST` no endpoint `/realms/{realm}/protocol/openid-connect/token`.
+Segue abaixo um exemplo de chamada por `curl`:
+```bash
+$ curl --location '{keycloak-host}/realms/wallet/protocol/openid-connect/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'grant_type=password' \
+--data-urlencode 'client_id={client_id}' \
+--data-urlencode 'client_secret={client_secret}' \
+--data-urlencode 'username={username}' \
+--data-urlencode 'password={password}' \
+--data-urlencode 'scope=openid'
+```
+Para atualizar o token basta fazer outra chamada para o mesmo endpoint. Segue abaixo um exemplo de chamada por `curl` para atualizar o token:
+```bash
+$ curl --location 'http://localhost:8081/realms/master/protocol/openid-connect/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'grant_type=refresh_token' \
+--data-urlencode 'client_id={client_id}' \
+--data-urlencode 'client_secret={client_secret}' \
+--data-urlencode 'refresh_token={refresh_token}'
+```
+
 ## Documentação
 A documentação da API deste projeto foi feita utilizando o projeto [swaggo/swag](https://github.com/swaggo/swag), que faz a conversão de anotações em Go para documentação Swagger 2.0. 
 Para acessar a documentação em Swagger, basta executar o projeto e acessar o endereço `http://localhost:8080/swagger/index.html` no navegador. 
@@ -82,6 +113,14 @@ O projeto está utilizando o Prometheus, e as métricas de monitoramento está d
 | DATABASE_NAME  | Nome do banco de dados  |
 | DATABASE_USERNAME  | Usuário do banco de dados  |
 | DATABASE_PASSWORD  | Senha do usuário do banco de dados  |
+| IDP_HOST  | Host do keycloak  |
+| IDP_PORT  | Porta do keycloak  |
+| IDP_MAIN_REALM  | Realm principal do keycloak. Geralmente o Realm `master`  |
+| IDP_USER_ADMIN  | Usuário administrador do keycloak  |
+| IDP_PASSWORD_ADMIN  | Senha do usuário administrador do keycloak  |
+| IDP_REALM  | Realm do keycloak que será usado para a aplicação  |
+| IDP_CLIENT_IDENTIFIER  | Id do client da API do keycloak  |
+| IDP_CLIENT_SECRET  | Secret do client da API do keycloak  |
 | ELASTIC_APM_SERVICE_NAME  | Nome do serviço no APM  |
 | ELASTIC_APM_SERVICE_VERSION  | Versão do serviço no APM  |
 | ELASTIC_APM_SERVER_URL  | Host/URL do serviço do APM  |

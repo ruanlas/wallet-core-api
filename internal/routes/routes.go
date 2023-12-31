@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ruanlas/wallet-core-api/docs"
+	"github.com/ruanlas/wallet-core-api/internal/idpauth"
 	v1 "github.com/ruanlas/wallet-core-api/internal/v1"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -24,7 +25,7 @@ func (r *Router) SetupRoutes() {
 	servicePort := os.Getenv("SERVICE_PORT")
 	serviceHost := os.Getenv("SERVICE_HOST")
 	router := gin.Default()
-	router.Use(apmgin.Middleware(router))
+	router.Use(apmgin.Middleware(router), idpauth.AuthenticationMiddleware, idpauth.AuthorizationMiddleware)
 
 	docs.SwaggerInfo.BasePath = "/"
 	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", serviceHost, servicePort)

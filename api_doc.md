@@ -24,7 +24,6 @@ Este endpoint permite obter uma listagem de receitas previstas
 | month | query | O mês que será filtrado a busca | Yes | string |
 | year | query | O ano que será filtrado a busca | Yes | string |
 | X-Access-Token | header | Token de autenticação do usuário | Yes | string |
-| X-Userinfo | header | Informações do usuário em base64 | Yes | string |
 
 ##### Responses
 
@@ -47,7 +46,6 @@ Este endpoint permite criar uma receita prevista
 | ---- | ---------- | ----------- | -------- | ------ |
 | gain_projection | body | Modelo de criação da receita prevista | Yes | [service.CreateRequest](#servicecreaterequest) |
 | X-Access-Token | header | Token de autenticação do usuário | Yes | string |
-| X-Userinfo | header | Informações do usuário em base64 | Yes | string |
 
 ##### Responses
 
@@ -72,7 +70,6 @@ Este endpoint permite remover uma receita prevista
 | ---- | ---------- | ----------- | -------- | ------ |
 | id | path | Id da receita prevista | Yes | string |
 | X-Access-Token | header | Token de autenticação do usuário | Yes | string |
-| X-Userinfo | header | Informações do usuário em base64 | Yes | string |
 
 ##### Responses
 
@@ -95,7 +92,6 @@ Este endpoint permite obter uma receita prevista
 | ---- | ---------- | ----------- | -------- | ------ |
 | id | path | Id da receita prevista | Yes | string |
 | X-Access-Token | header | Token de autenticação do usuário | Yes | string |
-| X-Userinfo | header | Informações do usuário em base64 | Yes | string |
 
 ##### Responses
 
@@ -118,7 +114,6 @@ Este endpoint permite editar uma receita prevista
 | ---- | ---------- | ----------- | -------- | ------ |
 | gain_projection | body | Modelo de edição da receita prevista | Yes | [service.UpdateRequest](#serviceupdaterequest) |
 | X-Access-Token | header | Token de autenticação do usuário | Yes | string |
-| X-Userinfo | header | Informações do usuário em base64 | Yes | string |
 
 ##### Responses
 
@@ -144,7 +139,6 @@ Este endpoint permite realizar uma receita que foi prevista
 | id | path | Id da receita prevista | Yes | string |
 | gain | body | Modelo de criação da receita | Yes | [service.CreateGainRequest](#servicecreategainrequest) |
 | X-Access-Token | header | Token de autenticação do usuário | Yes | string |
-| X-Userinfo | header | Informações do usuário em base64 | Yes | string |
 
 ##### Responses
 
