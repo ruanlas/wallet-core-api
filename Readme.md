@@ -17,6 +17,7 @@ Ele permitirá lançar projeções de receitas e gastos, além de permitir lanç
    * [Documentação](#documentação)
    * [Monitoramento](#monitoramento)
    * [Variáveis de ambiente](#variáveis-de-ambiente)
+   * [Documentação de referência](#documentação-de-referência)
 <!--te-->
 
 ## Tecnologias utilizadas neste projeto
@@ -125,3 +126,11 @@ O projeto está utilizando o Prometheus, e as métricas de monitoramento está d
 | ELASTIC_APM_SERVICE_VERSION  | Versão do serviço no APM  |
 | ELASTIC_APM_SERVER_URL  | Host/URL do serviço do APM  |
 
+## Documentação de referência
+[Keycloak](https://www.keycloak.org/documentation)
+
+[OpenID Connect Keycloak](https://www.keycloak.org/docs/latest/securing_apps/#_oidc)
+
+[Keycloak API](https://www.keycloak.org/docs-api/23.0.3/rest-api/index.html)
+
+[Gocloak - Golang Keycloak API Package](https://github.com/Nerzal/gocloak)
