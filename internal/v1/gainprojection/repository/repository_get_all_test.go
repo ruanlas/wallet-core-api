@@ -20,6 +20,7 @@ func TestGetAllSuccess(t *testing.T) {
 	queryParams := NewQueryParamsBuilder().
 		AddMonth(10).
 		AddYear(2024).
+		AddUserId("User1").
 		AddLimit(10).
 		AddOffset(0).
 		Build()
@@ -80,9 +81,9 @@ func TestGetAllSuccess(t *testing.T) {
 		INNER JOIN gain_category gc ON 
 			gc.id = gp.category_id
 		WHERE 
-			MONTH(gp.pay_in) = ? AND YEAR(gp.pay_in) = ?
+			MONTH(gp.pay_in) = ? AND YEAR(gp.pay_in) = ? AND gp.user_id = ?
 		LIMIT ? OFFSET ?`).
-		WithArgs(queryParams.month, queryParams.year, queryParams.limit, queryParams.offset).
+		WithArgs(queryParams.month, queryParams.year, queryParams.userId, queryParams.limit, queryParams.offset).
 		WillReturnRows(rowsGainProjectionMock)
 
 	listGainProjection, err := _repository.GetAll(context.Background(), queryParams)
@@ -104,6 +105,7 @@ func TestGetAllQueryFail(t *testing.T) {
 	queryParams := NewQueryParamsBuilder().
 		AddMonth(10).
 		AddYear(2024).
+		AddUserId("User1").
 		AddLimit(10).
 		AddOffset(0).
 		Build()
@@ -127,9 +129,9 @@ func TestGetAllQueryFail(t *testing.T) {
 		INNER JOIN gain_category gc ON 
 			gc.id = gp.category_id
 		WHERE 
-			MONTH(gp.pay_in) = ? AND YEAR(gp.pay_in) = ?
+			MONTH(gp.pay_in) = ? AND YEAR(gp.pay_in) = ? AND gp.user_id = ?
 		LIMIT ? OFFSET ?`).
-		WithArgs(queryParams.month, queryParams.year, queryParams.limit, queryParams.offset).
+		WithArgs(queryParams.month, queryParams.year, queryParams.userId, queryParams.limit, queryParams.offset).
 		WillReturnError(errors.New("An error has been ocurred"))
 
 	_, err = _repository.GetAll(context.Background(), queryParams)
@@ -150,6 +152,7 @@ func TestGetAllScanFail(t *testing.T) {
 	queryParams := NewQueryParamsBuilder().
 		AddMonth(10).
 		AddYear(2024).
+		AddUserId("User1").
 		AddLimit(10).
 		AddOffset(0).
 		Build()
@@ -197,9 +200,9 @@ func TestGetAllScanFail(t *testing.T) {
 		INNER JOIN gain_category gc ON 
 			gc.id = gp.category_id
 		WHERE 
-			MONTH(gp.pay_in) = ? AND YEAR(gp.pay_in) = ?
+			MONTH(gp.pay_in) = ? AND YEAR(gp.pay_in) = ? AND gp.user_id = ?
 		LIMIT ? OFFSET ?`).
-		WithArgs(queryParams.month, queryParams.year, queryParams.limit, queryParams.offset).
+		WithArgs(queryParams.month, queryParams.year, queryParams.userId, queryParams.limit, queryParams.offset).
 		WillReturnRows(rowsGainProjectionMock)
 
 	_, err = _repository.GetAll(context.Background(), queryParams)

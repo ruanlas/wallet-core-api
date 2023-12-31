@@ -32,6 +32,7 @@ type GainCategory struct {
 }
 
 type QueryParams struct {
+	userId string
 	month  uint
 	year   uint
 	limit  uint

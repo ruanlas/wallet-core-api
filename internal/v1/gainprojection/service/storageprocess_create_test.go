@@ -13,9 +13,9 @@ import (
 
 type mockRepository struct {
 	saveCallsMock            []func(ctx context.Context, gainProjection repository.GainProjection) (*repository.GainProjection, error)
-	getByIdCallsMock         []func(ctx context.Context, id string) (*repository.GainProjection, error)
+	getByIdCallsMock         []func(ctx context.Context, id string, userId string) (*repository.GainProjection, error)
 	editCallsMock            []func(ctx context.Context, gainProjection repository.GainProjection) (*repository.GainProjection, error)
-	removeCallsMock          []func(ctx context.Context, id string) error
+	removeCallsMock          []func(ctx context.Context, id string, userId string) error
 	getTotalRecordsCallsMock []func(ctx context.Context, params repository.QueryParams) (*uint, error)
 	getAllCallsMock          []func(ctx context.Context, params repository.QueryParams) (*[]repository.GainProjection, error)
 	saveGainCallsMock        []func(ctx context.Context, gain repository.Gain) (*repository.Gain, error)
@@ -28,7 +28,7 @@ func (r *mockRepository) AddSaveCall(
 }
 
 func (r *mockRepository) AddGetByIdCall(
-	getById func(ctx context.Context, id string) (*repository.GainProjection, error)) *mockRepository {
+	getById func(ctx context.Context, id string, userId string) (*repository.GainProjection, error)) *mockRepository {
 	r.getByIdCallsMock = append(r.getByIdCallsMock, getById)
 	return r
 }
@@ -40,7 +40,7 @@ func (r *mockRepository) AddEditCall(
 }
 
 func (r *mockRepository) AddRemoveCall(
-	remove func(ctx context.Context, id string) error) *mockRepository {
+	remove func(ctx context.Context, id string, userId string) error) *mockRepository {
 	r.removeCallsMock = append(r.removeCallsMock, remove)
 	return r
 }
@@ -81,20 +81,20 @@ func (r *mockRepository) Edit(ctx context.Context, gainProjection repository.Gai
 	return nil, nil
 }
 
-func (r *mockRepository) GetById(ctx context.Context, id string) (*repository.GainProjection, error) {
+func (r *mockRepository) GetById(ctx context.Context, id string, userId string) (*repository.GainProjection, error) {
 	if len(r.getByIdCallsMock) >= 1 {
 		getById := r.getByIdCallsMock[0]
 		r.getByIdCallsMock = r.getByIdCallsMock[1:]
-		return getById(ctx, id)
+		return getById(ctx, id, userId)
 	}
 	return nil, nil
 }
 
-func (r *mockRepository) Remove(ctx context.Context, id string) error {
+func (r *mockRepository) Remove(ctx context.Context, id string, userId string) error {
 	if len(r.removeCallsMock) >= 1 {
 		remove := r.removeCallsMock[0]
 		r.removeCallsMock = r.removeCallsMock[1:]
-		return remove(ctx, id)
+		return remove(ctx, id, userId)
 	}
 	return nil
 }
@@ -144,7 +144,7 @@ func TestCreateSuccessWithoutRecurrence(t *testing.T) {
 	_mockRepository.AddSaveCall(func(ctx context.Context, gainProjection repository.GainProjection) (*repository.GainProjection, error) {
 		return gainProjectMock, nil
 	})
-	_mockRepository.AddGetByIdCall(func(ctx context.Context, id string) (*repository.GainProjection, error) {
+	_mockRepository.AddGetByIdCall(func(ctx context.Context, id string, userId string) (*repository.GainProjection, error) {
 		return gainProjectMock, nil
 	})
 
@@ -162,7 +162,14 @@ func TestCreateSuccessWithoutRecurrence(t *testing.T) {
 	ctx := context.TODO()
 
 	_storageProcess := NewStorageProcess(_mockRepository, uuidMock)
-	response, err := _storageProcess.Create(ctx, request)
+
+	token := "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJRSnVoUjlFSFBIWTZFT195VjV4M1BTZWUzakRLNUs4M0lQMjJwYjFxZXFvIn0.eyJleHAiOjE3MDM4ODk3NTIsImlhdCI6MTcwMzg4OTQ1MiwianRpIjoiNTE4ZDM2MDctZjQ2NC00MDI5LTkwN2ItYjRjNzI1OWY0ZjU0IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgxL3JlYWxtcy93YWxsZXQiLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNTgzMmE1MDItYmVkZS00OTJkLThkYzEtYjEzYjMyYzMwZjI5IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoid2FsbGV0LWFwaSIsInNlc3Npb25fc3RhdGUiOiJhMmE2MDM5YS0zZTQxLTQ0MDEtOWJjNC01NWIyNDlkNmY3ZDYiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLXdhbGxldCJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJzaWQiOiJhMmE2MDM5YS0zZTQxLTQ0MDEtOWJjNC01NWIyNDlkNmY3ZDYiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlZF91c2VybmFtZSI6InRlc3RldXNlciJ9.AcRSnpgzjsuJL2n_QaRF1idkwDzwNpWNX3wiEOFXkqTG35lr4PYVYPxnhryvRvVVOvN_CUY-AaVmF_YSgR4s6JM3Oca5JFFf7T6fX5lXgj0SbQCUbbyh7Em3BemiNKr_T3wucAyO824MjGXP0smciCnnlWvq-apJDTB_R4EisDJubY_E_zpCmTfYMm0NcJ8aKB2ku8mACKgE2ZJ7WsHkKNmjaFeyU9KjGMmNKtFthYISKqRQW-6u2xPjCkpFt4_HoJ01PgjFrrJacWDlUHxVoSILcaH_Vg-WHrKppIkzgdOg5phB2zVtcakRhPhqzV4EX_jXJp2SgK4umf6ivTC3lg"
+	createCtx := CreateContext{
+		Ctx:       ctx,
+		Request:   request,
+		UserToken: token,
+	}
+	response, err := _storageProcess.Create(createCtx)
 	assert.NoError(t, err)
 	assert.Equal(t, "cd1cc27b-28a1-47dc-ac76-70e8185e159d", response.Id)
 	assert.Equal(t, uint(1), response.Recurrence)
@@ -189,7 +196,7 @@ func TestCreateSuccessWithRecurrence(t *testing.T) {
 	_mockRepository.AddSaveCall(func(ctx context.Context, gainProjection repository.GainProjection) (*repository.GainProjection, error) {
 		return gainProjectMock, nil
 	})
-	_mockRepository.AddGetByIdCall(func(ctx context.Context, id string) (*repository.GainProjection, error) {
+	_mockRepository.AddGetByIdCall(func(ctx context.Context, id string, userId string) (*repository.GainProjection, error) {
 		return gainProjectMock, nil
 	})
 
@@ -208,7 +215,14 @@ func TestCreateSuccessWithRecurrence(t *testing.T) {
 	ctx := context.TODO()
 
 	_storageProcess := NewStorageProcess(_mockRepository, uuidMock)
-	response, err := _storageProcess.Create(ctx, request)
+
+	token := "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJRSnVoUjlFSFBIWTZFT195VjV4M1BTZWUzakRLNUs4M0lQMjJwYjFxZXFvIn0.eyJleHAiOjE3MDM4ODk3NTIsImlhdCI6MTcwMzg4OTQ1MiwianRpIjoiNTE4ZDM2MDctZjQ2NC00MDI5LTkwN2ItYjRjNzI1OWY0ZjU0IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgxL3JlYWxtcy93YWxsZXQiLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNTgzMmE1MDItYmVkZS00OTJkLThkYzEtYjEzYjMyYzMwZjI5IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoid2FsbGV0LWFwaSIsInNlc3Npb25fc3RhdGUiOiJhMmE2MDM5YS0zZTQxLTQ0MDEtOWJjNC01NWIyNDlkNmY3ZDYiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLXdhbGxldCJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJzaWQiOiJhMmE2MDM5YS0zZTQxLTQ0MDEtOWJjNC01NWIyNDlkNmY3ZDYiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlZF91c2VybmFtZSI6InRlc3RldXNlciJ9.AcRSnpgzjsuJL2n_QaRF1idkwDzwNpWNX3wiEOFXkqTG35lr4PYVYPxnhryvRvVVOvN_CUY-AaVmF_YSgR4s6JM3Oca5JFFf7T6fX5lXgj0SbQCUbbyh7Em3BemiNKr_T3wucAyO824MjGXP0smciCnnlWvq-apJDTB_R4EisDJubY_E_zpCmTfYMm0NcJ8aKB2ku8mACKgE2ZJ7WsHkKNmjaFeyU9KjGMmNKtFthYISKqRQW-6u2xPjCkpFt4_HoJ01PgjFrrJacWDlUHxVoSILcaH_Vg-WHrKppIkzgdOg5phB2zVtcakRhPhqzV4EX_jXJp2SgK4umf6ivTC3lg"
+	createCtx := CreateContext{
+		Ctx:       ctx,
+		Request:   request,
+		UserToken: token,
+	}
+	response, err := _storageProcess.Create(createCtx)
 	assert.NoError(t, err)
 	assert.Equal(t, "cd1cc27b-28a1-47dc-ac76-70e8185e159d", response.Id)
 	assert.Equal(t, uint(2), response.Recurrence)
@@ -235,7 +249,14 @@ func TestCreateWithoutRecurrenceSaveFail(t *testing.T) {
 	ctx := context.TODO()
 
 	_storageProcess := NewStorageProcess(_mockRepository, uuidMock)
-	_, err := _storageProcess.Create(ctx, request)
+
+	token := "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJRSnVoUjlFSFBIWTZFT195VjV4M1BTZWUzakRLNUs4M0lQMjJwYjFxZXFvIn0.eyJleHAiOjE3MDM4ODk3NTIsImlhdCI6MTcwMzg4OTQ1MiwianRpIjoiNTE4ZDM2MDctZjQ2NC00MDI5LTkwN2ItYjRjNzI1OWY0ZjU0IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgxL3JlYWxtcy93YWxsZXQiLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNTgzMmE1MDItYmVkZS00OTJkLThkYzEtYjEzYjMyYzMwZjI5IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoid2FsbGV0LWFwaSIsInNlc3Npb25fc3RhdGUiOiJhMmE2MDM5YS0zZTQxLTQ0MDEtOWJjNC01NWIyNDlkNmY3ZDYiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLXdhbGxldCJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJzaWQiOiJhMmE2MDM5YS0zZTQxLTQ0MDEtOWJjNC01NWIyNDlkNmY3ZDYiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlZF91c2VybmFtZSI6InRlc3RldXNlciJ9.AcRSnpgzjsuJL2n_QaRF1idkwDzwNpWNX3wiEOFXkqTG35lr4PYVYPxnhryvRvVVOvN_CUY-AaVmF_YSgR4s6JM3Oca5JFFf7T6fX5lXgj0SbQCUbbyh7Em3BemiNKr_T3wucAyO824MjGXP0smciCnnlWvq-apJDTB_R4EisDJubY_E_zpCmTfYMm0NcJ8aKB2ku8mACKgE2ZJ7WsHkKNmjaFeyU9KjGMmNKtFthYISKqRQW-6u2xPjCkpFt4_HoJ01PgjFrrJacWDlUHxVoSILcaH_Vg-WHrKppIkzgdOg5phB2zVtcakRhPhqzV4EX_jXJp2SgK4umf6ivTC3lg"
+	createCtx := CreateContext{
+		Ctx:       ctx,
+		Request:   request,
+		UserToken: token,
+	}
+	_, err := _storageProcess.Create(createCtx)
 	assert.Error(t, err)
 
 }
@@ -258,7 +279,7 @@ func TestCreateWithoutRecurrenceGetByIdFail(t *testing.T) {
 	_mockRepository.AddSaveCall(func(ctx context.Context, gainProjection repository.GainProjection) (*repository.GainProjection, error) {
 		return gainProjectMock, nil
 	})
-	_mockRepository.AddGetByIdCall(func(ctx context.Context, id string) (*repository.GainProjection, error) {
+	_mockRepository.AddGetByIdCall(func(ctx context.Context, id string, userId string) (*repository.GainProjection, error) {
 		return nil, errors.New("An error has been ocurred")
 	})
 
@@ -276,7 +297,14 @@ func TestCreateWithoutRecurrenceGetByIdFail(t *testing.T) {
 	ctx := context.TODO()
 
 	_storageProcess := NewStorageProcess(_mockRepository, uuidMock)
-	_, err := _storageProcess.Create(ctx, request)
+
+	token := "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJRSnVoUjlFSFBIWTZFT195VjV4M1BTZWUzakRLNUs4M0lQMjJwYjFxZXFvIn0.eyJleHAiOjE3MDM4ODk3NTIsImlhdCI6MTcwMzg4OTQ1MiwianRpIjoiNTE4ZDM2MDctZjQ2NC00MDI5LTkwN2ItYjRjNzI1OWY0ZjU0IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgxL3JlYWxtcy93YWxsZXQiLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNTgzMmE1MDItYmVkZS00OTJkLThkYzEtYjEzYjMyYzMwZjI5IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoid2FsbGV0LWFwaSIsInNlc3Npb25fc3RhdGUiOiJhMmE2MDM5YS0zZTQxLTQ0MDEtOWJjNC01NWIyNDlkNmY3ZDYiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLXdhbGxldCJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJzaWQiOiJhMmE2MDM5YS0zZTQxLTQ0MDEtOWJjNC01NWIyNDlkNmY3ZDYiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlZF91c2VybmFtZSI6InRlc3RldXNlciJ9.AcRSnpgzjsuJL2n_QaRF1idkwDzwNpWNX3wiEOFXkqTG35lr4PYVYPxnhryvRvVVOvN_CUY-AaVmF_YSgR4s6JM3Oca5JFFf7T6fX5lXgj0SbQCUbbyh7Em3BemiNKr_T3wucAyO824MjGXP0smciCnnlWvq-apJDTB_R4EisDJubY_E_zpCmTfYMm0NcJ8aKB2ku8mACKgE2ZJ7WsHkKNmjaFeyU9KjGMmNKtFthYISKqRQW-6u2xPjCkpFt4_HoJ01PgjFrrJacWDlUHxVoSILcaH_Vg-WHrKppIkzgdOg5phB2zVtcakRhPhqzV4EX_jXJp2SgK4umf6ivTC3lg"
+	createCtx := CreateContext{
+		Ctx:       ctx,
+		Request:   request,
+		UserToken: token,
+	}
+	_, err := _storageProcess.Create(createCtx)
 	assert.Error(t, err)
 }
 
@@ -317,6 +345,13 @@ func TestCreateWithRecurrenceSaveFail(t *testing.T) {
 	ctx := context.TODO()
 
 	_storageProcess := NewStorageProcess(_mockRepository, uuidMock)
-	_, err := _storageProcess.Create(ctx, request)
+
+	token := "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJRSnVoUjlFSFBIWTZFT195VjV4M1BTZWUzakRLNUs4M0lQMjJwYjFxZXFvIn0.eyJleHAiOjE3MDM4ODk3NTIsImlhdCI6MTcwMzg4OTQ1MiwianRpIjoiNTE4ZDM2MDctZjQ2NC00MDI5LTkwN2ItYjRjNzI1OWY0ZjU0IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgxL3JlYWxtcy93YWxsZXQiLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNTgzMmE1MDItYmVkZS00OTJkLThkYzEtYjEzYjMyYzMwZjI5IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoid2FsbGV0LWFwaSIsInNlc3Npb25fc3RhdGUiOiJhMmE2MDM5YS0zZTQxLTQ0MDEtOWJjNC01NWIyNDlkNmY3ZDYiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLXdhbGxldCJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJzaWQiOiJhMmE2MDM5YS0zZTQxLTQ0MDEtOWJjNC01NWIyNDlkNmY3ZDYiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlZF91c2VybmFtZSI6InRlc3RldXNlciJ9.AcRSnpgzjsuJL2n_QaRF1idkwDzwNpWNX3wiEOFXkqTG35lr4PYVYPxnhryvRvVVOvN_CUY-AaVmF_YSgR4s6JM3Oca5JFFf7T6fX5lXgj0SbQCUbbyh7Em3BemiNKr_T3wucAyO824MjGXP0smciCnnlWvq-apJDTB_R4EisDJubY_E_zpCmTfYMm0NcJ8aKB2ku8mACKgE2ZJ7WsHkKNmjaFeyU9KjGMmNKtFthYISKqRQW-6u2xPjCkpFt4_HoJ01PgjFrrJacWDlUHxVoSILcaH_Vg-WHrKppIkzgdOg5phB2zVtcakRhPhqzV4EX_jXJp2SgK4umf6ivTC3lg"
+	createCtx := CreateContext{
+		Ctx:       ctx,
+		Request:   request,
+		UserToken: token,
+	}
+	_, err := _storageProcess.Create(createCtx)
 	assert.Error(t, err)
 }

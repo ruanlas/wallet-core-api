@@ -8,9 +8,9 @@ import (
 
 type Repository interface {
 	Save(ctx context.Context, gainProjection GainProjection) (*GainProjection, error)
-	GetById(ctx context.Context, id string) (*GainProjection, error)
+	GetById(ctx context.Context, id string, userId string) (*GainProjection, error)
 	Edit(ctx context.Context, gainProjection GainProjection) (*GainProjection, error)
-	Remove(ctx context.Context, id string) error
+	Remove(ctx context.Context, id string, userId string) error
 	GetTotalRecords(ctx context.Context, params QueryParams) (*uint, error)
 	GetAll(ctx context.Context, params QueryParams) (*[]GainProjection, error)
 	SaveGain(ctx context.Context, gain Gain) (*Gain, error)
@@ -57,7 +57,7 @@ func (r *repository) Save(ctx context.Context, gainProjection GainProjection) (*
 	return &gainProjection, nil
 }
 
-func (r *repository) GetById(ctx context.Context, id string) (*GainProjection, error) {
+func (r *repository) GetById(ctx context.Context, id string, userId string) (*GainProjection, error) {
 	results, err := r.db.QueryContext(ctx, `
 		SELECT
 			gp.id,
@@ -74,7 +74,7 @@ func (r *repository) GetById(ctx context.Context, id string) (*GainProjection, e
 			gain_projection gp
 		INNER JOIN gain_category gc ON 
 			gc.id = gp.category_id
-		WHERE gp.id = ?`, id)
+		WHERE gp.id = ? AND gp.user_id = ?`, id, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (r *repository) Edit(ctx context.Context, gainProjection GainProjection) (*
 	}
 	stmt, err := tx.PrepareContext(ctx, `
 		UPDATE gain_projection SET pay_in = ?, description = ?, value = ?, is_passive = ?, category_id = ?, is_already_done = ? 
-		WHERE id = ?`)
+		WHERE id = ? AND user_id = ?`)
 	if err != nil {
 		return nil, err
 	}
@@ -128,6 +128,7 @@ func (r *repository) Edit(ctx context.Context, gainProjection GainProjection) (*
 		gainProjection.Category.Id,
 		gainProjection.IsAlreadyDone,
 		gainProjection.Id,
+		gainProjection.UserId,
 	)
 	if err != nil {
 		return nil, err
@@ -139,17 +140,17 @@ func (r *repository) Edit(ctx context.Context, gainProjection GainProjection) (*
 	return &gainProjection, nil
 }
 
-func (r *repository) Remove(ctx context.Context, id string) error {
+func (r *repository) Remove(ctx context.Context, id string, userId string) error {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
-	stmt, err := tx.PrepareContext(ctx, `DELETE FROM gain_projection WHERE id = ?`)
+	stmt, err := tx.PrepareContext(ctx, `DELETE FROM gain_projection WHERE id = ? AND user_id = ?`)
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
-	_, err = stmt.Exec(id)
+	_, err = stmt.Exec(id, userId)
 	if err != nil {
 		return err
 	}
@@ -162,8 +163,8 @@ func (r *repository) Remove(ctx context.Context, id string) error {
 
 func (r *repository) GetTotalRecords(ctx context.Context, params QueryParams) (*uint, error) {
 	var totalRecords uint
-	query := `SELECT COUNT(*) as total_records FROM gain_projection WHERE MONTH(pay_in) = ? AND YEAR(pay_in) = ?`
-	row := r.db.QueryRowContext(ctx, query, params.month, params.year)
+	query := `SELECT COUNT(*) as total_records FROM gain_projection WHERE MONTH(pay_in) = ? AND YEAR(pay_in) = ? AND user_id = ?`
+	row := r.db.QueryRowContext(ctx, query, params.month, params.year, params.userId)
 	err := row.Scan(&totalRecords)
 	if err != nil {
 		return nil, err
@@ -189,9 +190,9 @@ func (r *repository) GetAll(ctx context.Context, params QueryParams) (*[]GainPro
 		INNER JOIN gain_category gc ON 
 			gc.id = gp.category_id
 		WHERE 
-			MONTH(gp.pay_in) = ? AND YEAR(gp.pay_in) = ?
+			MONTH(gp.pay_in) = ? AND YEAR(gp.pay_in) = ? AND gp.user_id = ?
 		LIMIT ? OFFSET ?`
-	rows, err := r.db.QueryContext(ctx, query, params.month, params.year, params.limit, params.offset)
+	rows, err := r.db.QueryContext(ctx, query, params.month, params.year, params.userId, params.limit, params.offset)
 	if err != nil {
 		return nil, err
 	}

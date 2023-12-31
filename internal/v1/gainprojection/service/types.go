@@ -1,6 +1,36 @@
 package service
 
-import "time"
+import (
+	"context"
+	"time"
+)
+
+type CreateContext struct {
+	Ctx       context.Context
+	Request   CreateRequest
+	UserToken string
+}
+
+type UpdateContext struct {
+	Ctx       context.Context
+	Request   UpdateRequest
+	UserToken string
+	Id        string
+}
+
+type CreateGainContext struct {
+	Ctx       context.Context
+	Request   CreateGainRequest
+	UserToken string
+	Id        string
+}
+
+type SearchContext struct {
+	Ctx       context.Context
+	Params    SearchParams
+	UserToken string
+	Id        string
+}
 
 type CreateRequest struct {
 	PayIn       time.Time `json:"pay_in"`

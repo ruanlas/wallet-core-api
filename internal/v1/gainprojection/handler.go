@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ruanlas/wallet-core-api/internal/idpauth"
 	"github.com/ruanlas/wallet-core-api/internal/tracing"
 	"github.com/ruanlas/wallet-core-api/internal/v1/gainprojection/service"
 	"go.elastic.co/apm"
@@ -38,13 +39,13 @@ func NewHandler(storageProcess service.StorageProcess, readingProcess service.Re
 // @Produce json
 // @Param gain_projection body service.CreateRequest true "Modelo de criação da receita prevista"
 // @Param   X-Access-Token	header	string	true	"Token de autenticação do usuário"
-// @Param   X-Userinfo	header	string	true	"Informações do usuário em base64"
 // @Success 201 {object} service.GainProjectionResponse
 // @Router /v1/gain-projection [post]
 func (h *handler) Create(c *gin.Context) {
 	var request service.CreateRequest
 	ctx := c.Request.Context()
 	tx := apm.TransactionFromContext(ctx)
+	userToken := c.GetHeader(idpauth.AUTH_HEADER)
 	// apm.TransactionFromContext(ctx)
 
 	err := c.ShouldBindJSON(&request)
@@ -53,7 +54,12 @@ func (h *handler) Create(c *gin.Context) {
 		return
 	}
 	span := tx.StartSpan("GainProjection::StorageProcess::Create", "Create new gain-projection", nil)
-	gainCreated, err := h.storageProcess.Create(c.Request.Context(), request)
+	createCtx := service.CreateContext{
+		Ctx:       ctx,
+		UserToken: userToken,
+		Request:   request,
+	}
+	gainCreated, err := h.storageProcess.Create(createCtx)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": http.StatusInternalServerError, "message": err.Error()})
 		tracing.SendSpanErr(span, err)
@@ -70,17 +76,22 @@ func (h *handler) Create(c *gin.Context) {
 // @Produce json
 // @Param id path string true "Id da receita prevista"
 // @Param   X-Access-Token	header	string	true	"Token de autenticação do usuário"
-// @Param   X-Userinfo	header	string	true	"Informações do usuário em base64"
 // @Success 200 {object} service.GainProjectionResponse
 // @Router /v1/gain-projection/{id} [get]
 func (h *handler) GetById(c *gin.Context) {
 	ctx := c.Request.Context()
 	tx := apm.TransactionFromContext(ctx)
-
+	userToken := c.GetHeader(idpauth.AUTH_HEADER)
 	id := c.Param("id")
 
 	span := tx.StartSpan("GainProjection::ReadingProcess::GetById", "Get a gain-projection by id", nil)
-	gainProjection, err := h.readingProcess.GetById(c.Request.Context(), id)
+
+	searchCtx := service.SearchContext{
+		Ctx:       ctx,
+		Id:        id,
+		UserToken: userToken,
+	}
+	gainProjection, err := h.readingProcess.GetById(searchCtx)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": http.StatusInternalServerError, "message": err.Error()})
 		tracing.SendSpanErr(span, err)
@@ -102,13 +113,13 @@ func (h *handler) GetById(c *gin.Context) {
 // @Produce json
 // @Param gain_projection body service.UpdateRequest true "Modelo de edição da receita prevista"
 // @Param   X-Access-Token	header	string	true	"Token de autenticação do usuário"
-// @Param   X-Userinfo	header	string	true	"Informações do usuário em base64"
 // @Success 200 {object} service.GainProjectionResponse
 // @Router /v1/gain-projection/{id} [put]
 func (h *handler) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	tx := apm.TransactionFromContext(ctx)
 
+	userToken := c.GetHeader(idpauth.AUTH_HEADER)
 	id := c.Param("id")
 	var request service.UpdateRequest
 	err := c.ShouldBindJSON(&request)
@@ -117,7 +128,13 @@ func (h *handler) Update(c *gin.Context) {
 		return
 	}
 	span := tx.StartSpan("GainProjection::StorageProcess::Update", "Create new gain-projection", nil)
-	gainUpdated, err := h.storageProcess.Update(c.Request.Context(), id, request)
+	updateCtx := service.UpdateContext{
+		Ctx:       ctx,
+		Request:   request,
+		Id:        id,
+		UserToken: userToken,
+	}
+	gainUpdated, err := h.storageProcess.Update(updateCtx)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": http.StatusInternalServerError, "message": err.Error()})
 		tracing.SendSpanErr(span, err)
@@ -138,7 +155,6 @@ func (h *handler) Update(c *gin.Context) {
 // @Produce json
 // @Param id path string true "Id da receita prevista"
 // @Param   X-Access-Token	header	string	true	"Token de autenticação do usuário"
-// @Param   X-Userinfo	header	string	true	"Informações do usuário em base64"
 // @Success 200 {object} ResponseDefault{status=int,message=string}
 // @Router /v1/gain-projection/{id} [delete]
 func (h *handler) Delete(c *gin.Context) {
@@ -146,8 +162,14 @@ func (h *handler) Delete(c *gin.Context) {
 	tx := apm.TransactionFromContext(ctx)
 
 	id := c.Param("id")
+	userToken := c.GetHeader(idpauth.AUTH_HEADER)
 	span := tx.StartSpan("GainProjection::StorageProcess::Delete", "Delete a gain-projection", nil)
-	err := h.storageProcess.Delete(c.Request.Context(), id)
+	searchCtx := service.SearchContext{
+		Ctx:       ctx,
+		Id:        id,
+		UserToken: userToken,
+	}
+	err := h.storageProcess.Delete(searchCtx)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": http.StatusInternalServerError, "message": err.Error()})
 		tracing.SendSpanErr(span, err)
@@ -167,20 +189,25 @@ func (h *handler) Delete(c *gin.Context) {
 // @Param month query string true "O mês que será filtrado a busca"
 // @Param year query string true "O ano que será filtrado a busca"
 // @Param   X-Access-Token	header	string	true	"Token de autenticação do usuário"
-// @Param   X-Userinfo	header	string	true	"Informações do usuário em base64"
 // @Success 200 {object} service.GainProjectionPaginateResponse
 // @Router /v1/gain-projection [get]
 func (h *handler) GetAll(c *gin.Context) {
 	ctx := c.Request.Context()
 	tx := apm.TransactionFromContext(ctx)
 
+	userToken := c.GetHeader(idpauth.AUTH_HEADER)
 	searchParams, err := validateAndGetSearchParams(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "message": err.Error()})
 		return
 	}
 	span := tx.StartSpan("GainProjection::ReadingProcess::GetAllPaginated", "Get a gain-projection paginated", nil)
-	resultPaginated, err := h.readingProcess.GetAllPaginated(ctx, *searchParams)
+	searchCtx := service.SearchContext{
+		UserToken: userToken,
+		Params:    *searchParams,
+		Ctx:       ctx,
+	}
+	resultPaginated, err := h.readingProcess.GetAllPaginated(searchCtx)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": http.StatusInternalServerError, "message": err.Error()})
 		tracing.SendSpanErr(span, err)
@@ -199,13 +226,13 @@ func (h *handler) GetAll(c *gin.Context) {
 // @Param id path string true "Id da receita prevista"
 // @Param gain body service.CreateGainRequest true "Modelo de criação da receita"
 // @Param   X-Access-Token	header	string	true	"Token de autenticação do usuário"
-// @Param   X-Userinfo	header	string	true	"Informações do usuário em base64"
 // @Success 200 {object} service.GainResponse
 // @Router /v1/gain-projection/{id}/create-gain [post]
 func (h *handler) CreateGain(c *gin.Context) {
 	ctx := c.Request.Context()
 	tx := apm.TransactionFromContext(ctx)
 
+	userToken := c.GetHeader(idpauth.AUTH_HEADER)
 	id := c.Param("id")
 	var request service.CreateGainRequest
 	err := c.ShouldBindJSON(&request)
@@ -214,7 +241,12 @@ func (h *handler) CreateGain(c *gin.Context) {
 		return
 	}
 	span := tx.StartSpan("GainProjection::StorageProcess::CreateGain", "Create a gain from gain-projection", nil)
-	stat, err := h.storageProcess.CreateGain(ctx, id, request)
+	createGainCtx := service.CreateGainContext{
+		Ctx:       ctx,
+		Id:        id,
+		UserToken: userToken,
+	}
+	stat, err := h.storageProcess.CreateGain(createGainCtx)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": http.StatusInternalServerError, "message": err.Error()})
 		tracing.SendSpanErr(span, err)

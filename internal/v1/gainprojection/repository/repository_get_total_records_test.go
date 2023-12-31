@@ -18,7 +18,7 @@ func TestGetTotalRecordsSuccess(t *testing.T) {
 
 	queryParams := NewQueryParamsBuilder().
 		AddMonth(10).
-		AddYear(2024).Build()
+		AddYear(2024).AddUserId("User1").Build()
 
 	totalRecordsMock := sqlMock.NewRows([]string{
 		"total_records",
@@ -27,8 +27,8 @@ func TestGetTotalRecordsSuccess(t *testing.T) {
 	_repository := New(dbMock)
 
 	sqlMock.ExpectQuery(`
-		SELECT COUNT(*) as total_records FROM gain_projection WHERE MONTH(pay_in) = ? AND YEAR(pay_in) = ?`).
-		WithArgs(queryParams.month, queryParams.year).
+		SELECT COUNT(*) as total_records FROM gain_projection WHERE MONTH(pay_in) = ? AND YEAR(pay_in) = ? AND user_id = ?`).
+		WithArgs(queryParams.month, queryParams.year, queryParams.userId).
 		WillReturnRows(totalRecordsMock)
 
 	totalRecords, err := _repository.GetTotalRecords(context.Background(), queryParams)
@@ -49,7 +49,7 @@ func TestGetTotalRecordsScanFail(t *testing.T) {
 
 	queryParams := NewQueryParamsBuilder().
 		AddMonth(10).
-		AddYear(2024).Build()
+		AddYear(2024).AddUserId("User1").Build()
 
 	totalRecordsMock := sqlMock.NewRows([]string{
 		"total_records",
@@ -58,8 +58,8 @@ func TestGetTotalRecordsScanFail(t *testing.T) {
 	_repository := New(dbMock)
 
 	sqlMock.ExpectQuery(`
-		SELECT COUNT(*) as total_records FROM gain_projection WHERE MONTH(pay_in) = ? AND YEAR(pay_in) = ?`).
-		WithArgs(queryParams.month, queryParams.year).
+		SELECT COUNT(*) as total_records FROM gain_projection WHERE MONTH(pay_in) = ? AND YEAR(pay_in) = ? AND user_id = ?`).
+		WithArgs(queryParams.month, queryParams.year, queryParams.userId).
 		WillReturnRows(totalRecordsMock)
 
 	_, err = _repository.GetTotalRecords(context.Background(), queryParams)

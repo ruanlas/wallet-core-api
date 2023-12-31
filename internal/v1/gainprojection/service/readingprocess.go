@@ -1,14 +1,13 @@
 package service
 
 import (
-	"context"
-
+	"github.com/ruanlas/wallet-core-api/internal/idpauth"
 	"github.com/ruanlas/wallet-core-api/internal/v1/gainprojection/repository"
 )
 
 type ReadingProcess interface {
-	GetById(ctx context.Context, gainProjectionId string) (*GainProjectionResponse, error)
-	GetAllPaginated(ctx context.Context, search SearchParams) (*GainProjectionPaginateResponse, error)
+	GetById(searchCtx SearchContext) (*GainProjectionResponse, error)
+	GetAllPaginated(searchCtx SearchContext) (*GainProjectionPaginateResponse, error)
 }
 
 type readingProcess struct {
@@ -19,8 +18,9 @@ func NewReadingProcess(repository repository.Repository) ReadingProcess {
 	return &readingProcess{repository: repository}
 }
 
-func (rp *readingProcess) GetById(ctx context.Context, gainProjectionId string) (*GainProjectionResponse, error) {
-	gainProjection, err := rp.repository.GetById(ctx, gainProjectionId)
+func (rp *readingProcess) GetById(searchCtx SearchContext) (*GainProjectionResponse, error) {
+	user := idpauth.GetUser(searchCtx.UserToken)
+	gainProjection, err := rp.repository.GetById(searchCtx.Ctx, searchCtx.Id, user.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -50,22 +50,24 @@ func (rp *readingProcess) getTotalPages(totalRecords uint, pagesize uint) uint {
 	return totalPages
 }
 
-func (rp *readingProcess) GetAllPaginated(ctx context.Context, search SearchParams) (*GainProjectionPaginateResponse, error) {
-
+func (rp *readingProcess) GetAllPaginated(searchCtx SearchContext) (*GainProjectionPaginateResponse, error) {
+	search := searchCtx.Params
+	user := idpauth.GetUser(searchCtx.UserToken)
 	offset := rp.getOffset(*search.paginate.page, *search.paginate.pagesize)
 	queryParam := repository.NewQueryParamsBuilder().
 		AddMonth(*search.month).
 		AddYear(*search.year).
+		AddUserId(user.Id).
 		AddOffset(offset).
 		AddLimit(*search.paginate.pagesize).
 		Build()
 
-	totalRecords, err := rp.repository.GetTotalRecords(ctx, queryParam)
+	totalRecords, err := rp.repository.GetTotalRecords(searchCtx.Ctx, queryParam)
 	if err != nil {
 		return nil, err
 	}
 	totalPages := rp.getTotalPages(*totalRecords, *search.paginate.pagesize)
-	gainProjectionList, err := rp.repository.GetAll(ctx, queryParam)
+	gainProjectionList, err := rp.repository.GetAll(searchCtx.Ctx, queryParam)
 	if err != nil {
 		return nil, err
 	}
