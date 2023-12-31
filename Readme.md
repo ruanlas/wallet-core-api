@@ -12,6 +12,8 @@ Ele permitirá lançar projeções de receitas e gastos, além de permitir lanç
    * [Pré-requisitos](#pré-requisitos)
    * [Ambiente de desenvolvimento](#ambiente-de-desenvolvimento)
       * [Comandos úteis](#comandos-úteis)
+      * [Obtendo o token do usuário](#obtendo-o-token-do-usuário)
+         * [Autenticando na API do keycloak](#autenticando-na-api-do-keycloak)
    * [Documentação](#documentação)
    * [Monitoramento](#monitoramento)
    * [Variáveis de ambiente](#variáveis-de-ambiente)
