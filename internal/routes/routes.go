@@ -38,6 +38,12 @@ func (r *Router) SetupRoutes() {
 	v1router.DELETE("/gain-projection/:id", r.apiV1.GetGainProjectionHandler().Delete)
 	v1router.POST("/gain-projection/:id/create-gain", r.apiV1.GetGainProjectionHandler().CreateGain)
 
+	v1router.POST("/gain", r.apiV1.GetGainHandler().Create)
+	v1router.GET("/gain", r.apiV1.GetGainHandler().GetAll)
+	v1router.GET("/gain/:id", r.apiV1.GetGainHandler().GetById)
+	v1router.PUT("/gain/:id", r.apiV1.GetGainHandler().Update)
+	v1router.DELETE("/gain/:id", r.apiV1.GetGainHandler().Delete)
+
 	serviceAddr := fmt.Sprintf(":%s", servicePort)
 	router.Run(serviceAddr)
 }

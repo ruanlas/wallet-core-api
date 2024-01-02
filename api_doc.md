@@ -4,6 +4,124 @@ API que dispões de recursos para gerenciar as finanças pessoais
 ## Version: 0.1.0
 
 ---
+### /v1/gain
+
+#### GET
+##### Summary
+
+Obter uma listagem de Receitas
+
+##### Description
+
+Este endpoint permite obter uma listagem de receitas
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| page_size | query | O número de registros retornados pela busca | No | string |
+| page | query | A página que será buscada | No | string |
+| month | query | O mês que será filtrado a busca | Yes | string |
+| year | query | O ano que será filtrado a busca | Yes | string |
+| X-Access-Token | header | Token de autenticação do usuário | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | OK | [gservice.GainPaginateResponse](#gservicegainpaginateresponse) |
+
+#### POST
+##### Summary
+
+Criar uma Receita
+
+##### Description
+
+Este endpoint permite criar uma receita
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| gain | body | Modelo de criação da receita | Yes | [gservice.CreateRequest](#gservicecreaterequest) |
+| X-Access-Token | header | Token de autenticação do usuário | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 201 | Created | [gservice.GainResponse](#gservicegainresponse) |
+
+### /v1/gain/{id}
+
+#### DELETE
+##### Summary
+
+Remove uma Receita
+
+##### Description
+
+Este endpoint permite remover uma receita
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| id | path | Id da receita | Yes | string |
+| X-Access-Token | header | Token de autenticação do usuário | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | OK | [gain.ResponseDefault](#gainresponsedefault) & { **"message"**: string, **"status"**: integer } |
+
+#### GET
+##### Summary
+
+Obter uma Receita
+
+##### Description
+
+Este endpoint permite obter uma receita
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| id | path | Id da receita | Yes | string |
+| X-Access-Token | header | Token de autenticação do usuário | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | OK | [gservice.GainResponse](#gservicegainresponse) |
+
+#### PUT
+##### Summary
+
+Editar uma Receita
+
+##### Description
+
+Este endpoint permite editar uma receita
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| gain | body | Modelo de edição da receita | Yes | [gservice.UpdateRequest](#gserviceupdaterequest) |
+| X-Access-Token | header | Token de autenticação do usuário | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | OK | [gservice.GainResponse](#gservicegainresponse) |
+
+---
 ### /v1/gain-projection
 
 #### GET
@@ -29,7 +147,7 @@ Este endpoint permite obter uma listagem de receitas previstas
 
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
-| 200 | OK | [service.GainProjectionPaginateResponse](#servicegainprojectionpaginateresponse) |
+| 200 | OK | [gpservice.GainProjectionPaginateResponse](#gpservicegainprojectionpaginateresponse) |
 
 #### POST
 ##### Summary
@@ -44,14 +162,14 @@ Este endpoint permite criar uma receita prevista
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| gain_projection | body | Modelo de criação da receita prevista | Yes | [service.CreateRequest](#servicecreaterequest) |
+| gain_projection | body | Modelo de criação da receita prevista | Yes | [gpservice.CreateRequest](#gpservicecreaterequest) |
 | X-Access-Token | header | Token de autenticação do usuário | Yes | string |
 
 ##### Responses
 
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
-| 201 | Created | [service.GainProjectionResponse](#servicegainprojectionresponse) |
+| 201 | Created | [gpservice.GainProjectionResponse](#gpservicegainprojectionresponse) |
 
 ### /v1/gain-projection/{id}
 
@@ -97,7 +215,7 @@ Este endpoint permite obter uma receita prevista
 
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
-| 200 | OK | [service.GainProjectionResponse](#servicegainprojectionresponse) |
+| 200 | OK | [gpservice.GainProjectionResponse](#gpservicegainprojectionresponse) |
 
 #### PUT
 ##### Summary
@@ -112,14 +230,14 @@ Este endpoint permite editar uma receita prevista
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| gain_projection | body | Modelo de edição da receita prevista | Yes | [service.UpdateRequest](#serviceupdaterequest) |
+| gain_projection | body | Modelo de edição da receita prevista | Yes | [gpservice.UpdateRequest](#gpserviceupdaterequest) |
 | X-Access-Token | header | Token de autenticação do usuário | Yes | string |
 
 ##### Responses
 
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
-| 200 | OK | [service.GainProjectionResponse](#servicegainprojectionresponse) |
+| 200 | OK | [gpservice.GainProjectionResponse](#gpservicegainprojectionresponse) |
 
 ### /v1/gain-projection/{id}/create-gain
 
@@ -137,17 +255,23 @@ Este endpoint permite realizar uma receita que foi prevista
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
 | id | path | Id da receita prevista | Yes | string |
-| gain | body | Modelo de criação da receita | Yes | [service.CreateGainRequest](#servicecreategainrequest) |
+| gain | body | Modelo de criação da receita | Yes | [gpservice.CreateGainRequest](#gpservicecreategainrequest) |
 | X-Access-Token | header | Token de autenticação do usuário | Yes | string |
 
 ##### Responses
 
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
-| 200 | OK | [service.GainResponse](#servicegainresponse) |
+| 200 | OK | [gpservice.GainResponse](#gpservicegainresponse) |
 
 ---
 ### Models
+
+#### gain.ResponseDefault
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| gain.ResponseDefault | object |  |  |
 
 #### gainprojection.ResponseDefault
 
@@ -155,21 +279,21 @@ Este endpoint permite realizar uma receita que foi prevista
 | ---- | ---- | ----------- | -------- |
 | gainprojection.ResponseDefault | object |  |  |
 
-#### service.CategoryResponse
+#### gpservice.CategoryResponse
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | category | string |  | No |
 | id | integer |  | No |
 
-#### service.CreateGainRequest
+#### gpservice.CreateGainRequest
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | pay_in | string |  | No |
 | value | number |  | No |
 
-#### service.CreateRequest
+#### gpservice.CreateRequest
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
@@ -180,21 +304,21 @@ Este endpoint permite realizar uma receita que foi prevista
 | recurrence | integer |  | No |
 | value | number |  | No |
 
-#### service.GainProjectionPaginateResponse
+#### gpservice.GainProjectionPaginateResponse
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | current_page | integer |  | No |
 | page_limit | integer |  | No |
-| records | [ [service.GainProjectionResponse](#servicegainprojectionresponse) ] |  | No |
+| records | [ [gpservice.GainProjectionResponse](#gpservicegainprojectionresponse) ] |  | No |
 | total_pages | integer |  | No |
 | total_records | integer |  | No |
 
-#### service.GainProjectionResponse
+#### gpservice.GainProjectionResponse
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| category | [service.CategoryResponse](#servicecategoryresponse) |  | No |
+| category | [gpservice.CategoryResponse](#gpservicecategoryresponse) |  | No |
 | description | string |  | No |
 | id | string |  | No |
 | is_passive | boolean |  | No |
@@ -202,11 +326,11 @@ Este endpoint permite realizar uma receita que foi prevista
 | recurrence | integer |  | No |
 | value | number |  | No |
 
-#### service.GainResponse
+#### gpservice.GainResponse
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| category | [service.CategoryResponse](#servicecategoryresponse) |  | No |
+| category | [gpservice.CategoryResponse](#gpservicecategoryresponse) |  | No |
 | description | string |  | No |
 | gain_projection_id | string |  | No |
 | id | string |  | No |
@@ -214,7 +338,56 @@ Este endpoint permite realizar uma receita que foi prevista
 | pay_in | string |  | No |
 | value | number |  | No |
 
-#### service.UpdateRequest
+#### gpservice.UpdateRequest
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| category_id | integer |  | No |
+| description | string |  | No |
+| is_passive | boolean |  | No |
+| pay_in | string |  | No |
+| value | number |  | No |
+
+#### gservice.CategoryResponse
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| category | string |  | No |
+| id | integer |  | No |
+
+#### gservice.CreateRequest
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| category_id | integer |  | No |
+| description | string |  | No |
+| is_passive | boolean |  | No |
+| pay_in | string |  | No |
+| value | number |  | No |
+
+#### gservice.GainPaginateResponse
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| current_page | integer |  | No |
+| page_limit | integer |  | No |
+| records | [ [gservice.GainResponse](#gservicegainresponse) ] |  | No |
+| total_pages | integer |  | No |
+| total_records | integer |  | No |
+
+#### gservice.GainResponse
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| category | [gservice.CategoryResponse](#gservicecategoryresponse) |  | No |
+| description | string |  | No |
+| gain_projection_id | string |  | No |
+| id | string |  | No |
+| is_passive | boolean |  | No |
+| pay_in | string |  | No |
+| value | number |  | No |
+
+#### gservice.UpdateRequest
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |

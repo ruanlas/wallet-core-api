@@ -1,4 +1,4 @@
-package service
+package gservice
 
 import (
 	"context"
@@ -6,18 +6,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ruanlas/wallet-core-api/internal/v1/gainprojection/repository"
+	"github.com/ruanlas/wallet-core-api/internal/v1/gain/repository"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetAllPaginatedSuccess(t *testing.T) {
 	createdAt := time.Now()
-	gainProjectMock := repository.NewGainProjectionBuilder().
+	gainProjectMock := repository.NewGainBuilder().
 		AddId("cd1cc27b-28a1-47dc-ac76-70e8185e159d").
 		AddCreatedAt(createdAt).
 		AddPayIn(createdAt).
 		AddIsPassive(true).
-		AddIsAlreadyDone(false).
 		AddCategory(repository.GainCategory{Id: 2, Category: "Salário"}).
 		AddDescription("Description teste").
 		AddValue(750.50).
@@ -28,8 +27,8 @@ func TestGetAllPaginatedSuccess(t *testing.T) {
 		totalRecords := uint(5)
 		return &totalRecords, nil
 	})
-	_mockRepository.AddGetAllCalls(func(ctx context.Context, params repository.QueryParams) (*[]repository.GainProjection, error) {
-		return &[]repository.GainProjection{*gainProjectMock}, nil
+	_mockRepository.AddGetAllCalls(func(ctx context.Context, params repository.QueryParams) (*[]repository.Gain, error) {
+		return &[]repository.Gain{*gainProjectMock}, nil
 	})
 
 	ctx := context.TODO()
@@ -86,7 +85,7 @@ func TestGetAllPaginatedGetAllFail(t *testing.T) {
 		totalRecords := uint(5)
 		return &totalRecords, nil
 	})
-	_mockRepository.AddGetAllCalls(func(ctx context.Context, params repository.QueryParams) (*[]repository.GainProjection, error) {
+	_mockRepository.AddGetAllCalls(func(ctx context.Context, params repository.QueryParams) (*[]repository.Gain, error) {
 		return nil, errors.New("An error has been ocurred")
 	})
 
