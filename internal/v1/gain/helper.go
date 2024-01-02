@@ -1,14 +1,14 @@
-package gainprojection
+package gain
 
 import (
 	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ruanlas/wallet-core-api/internal/v1/gainprojection/gpservice"
+	"github.com/ruanlas/wallet-core-api/internal/v1/gain/gservice"
 )
 
-func validateAndGetSearchParams(c *gin.Context) (*gpservice.SearchParams, error) {
+func validateAndGetSearchParams(c *gin.Context) (*gservice.SearchParams, error) {
 	month, _ := strconv.ParseUint(c.Query("month"), 10, 32)
 	year, _ := strconv.ParseUint(c.Query("year"), 10, 32)
 	page, _ := strconv.ParseUint(c.Query("page"), 10, 32)
@@ -26,7 +26,7 @@ func validateAndGetSearchParams(c *gin.Context) (*gpservice.SearchParams, error)
 	if pagesize == uint64(0) {
 		pagesize = uint64(10)
 	}
-	return gpservice.NewSearchParamsBuilder().
+	return gservice.NewSearchParamsBuilder().
 		AddMonth(uint(month)).
 		AddYear(uint(year)).
 		AddPage(uint(page)).

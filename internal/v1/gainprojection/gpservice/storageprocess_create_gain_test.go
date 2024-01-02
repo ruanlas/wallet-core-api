@@ -1,4 +1,4 @@
-package service
+package gpservice
 
 import (
 	"context"

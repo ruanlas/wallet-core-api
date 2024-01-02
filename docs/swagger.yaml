@@ -1,22 +1,24 @@
 basePath: /api/
 definitions:
+  gain.ResponseDefault:
+    type: object
   gainprojection.ResponseDefault:
     type: object
-  service.CategoryResponse:
+  gpservice.CategoryResponse:
     properties:
       category:
         type: string
       id:
         type: integer
     type: object
-  service.CreateGainRequest:
+  gpservice.CreateGainRequest:
     properties:
       pay_in:
         type: string
       value:
         type: number
     type: object
-  service.CreateRequest:
+  gpservice.CreateRequest:
     properties:
       category_id:
         type: integer
@@ -31,7 +33,7 @@ definitions:
       value:
         type: number
     type: object
-  service.GainProjectionPaginateResponse:
+  gpservice.GainProjectionPaginateResponse:
     properties:
       current_page:
         type: integer
@@ -39,17 +41,17 @@ definitions:
         type: integer
       records:
         items:
-          $ref: '#/definitions/service.GainProjectionResponse'
+          $ref: '#/definitions/gpservice.GainProjectionResponse'
         type: array
       total_pages:
         type: integer
       total_records:
         type: integer
     type: object
-  service.GainProjectionResponse:
+  gpservice.GainProjectionResponse:
     properties:
       category:
-        $ref: '#/definitions/service.CategoryResponse'
+        $ref: '#/definitions/gpservice.CategoryResponse'
       description:
         type: string
       id:
@@ -63,10 +65,10 @@ definitions:
       value:
         type: number
     type: object
-  service.GainResponse:
+  gpservice.GainResponse:
     properties:
       category:
-        $ref: '#/definitions/service.CategoryResponse'
+        $ref: '#/definitions/gpservice.CategoryResponse'
       description:
         type: string
       gain_projection_id:
@@ -80,7 +82,72 @@ definitions:
       value:
         type: number
     type: object
-  service.UpdateRequest:
+  gpservice.UpdateRequest:
+    properties:
+      category_id:
+        type: integer
+      description:
+        type: string
+      is_passive:
+        type: boolean
+      pay_in:
+        type: string
+      value:
+        type: number
+    type: object
+  gservice.CategoryResponse:
+    properties:
+      category:
+        type: string
+      id:
+        type: integer
+    type: object
+  gservice.CreateRequest:
+    properties:
+      category_id:
+        type: integer
+      description:
+        type: string
+      is_passive:
+        type: boolean
+      pay_in:
+        type: string
+      value:
+        type: number
+    type: object
+  gservice.GainPaginateResponse:
+    properties:
+      current_page:
+        type: integer
+      page_limit:
+        type: integer
+      records:
+        items:
+          $ref: '#/definitions/gservice.GainResponse'
+        type: array
+      total_pages:
+        type: integer
+      total_records:
+        type: integer
+    type: object
+  gservice.GainResponse:
+    properties:
+      category:
+        $ref: '#/definitions/gservice.CategoryResponse'
+      description:
+        type: string
+      gain_projection_id:
+        type: string
+      id:
+        type: string
+      is_passive:
+        type: boolean
+      pay_in:
+        type: string
+      value:
+        type: number
+    type: object
+  gservice.UpdateRequest:
     properties:
       category_id:
         type: integer
@@ -100,6 +167,71 @@ info:
   title: Wallet Core
   version: 0.1.0
 paths:
+  /v1/gain:
+    get:
+      consumes:
+      - application/json
+      description: Este endpoint permite obter uma listagem de receitas
+      parameters:
+      - description: O número de registros retornados pela busca
+        in: query
+        name: page_size
+        type: string
+      - description: A página que será buscada
+        in: query
+        name: page
+        type: string
+      - description: O mês que será filtrado a busca
+        in: query
+        name: month
+        required: true
+        type: string
+      - description: O ano que será filtrado a busca
+        in: query
+        name: year
+        required: true
+        type: string
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gservice.GainPaginateResponse'
+      summary: Obter uma listagem de Receitas
+      tags:
+      - Gain
+    post:
+      consumes:
+      - application/json
+      description: Este endpoint permite criar uma receita
+      parameters:
+      - description: Modelo de criação da receita
+        in: body
+        name: gain
+        required: true
+        schema:
+          $ref: '#/definitions/gservice.CreateRequest'
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/gservice.GainResponse'
+      summary: Criar uma Receita
+      tags:
+      - Gain
   /v1/gain-projection:
     get:
       consumes:
@@ -135,7 +267,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/service.GainProjectionPaginateResponse'
+            $ref: '#/definitions/gpservice.GainProjectionPaginateResponse'
       summary: Obter uma listagem de Receitas Previstas
       tags:
       - Gain-Projection
@@ -149,7 +281,7 @@ paths:
         name: gain_projection
         required: true
         schema:
-          $ref: '#/definitions/service.CreateRequest'
+          $ref: '#/definitions/gpservice.CreateRequest'
       - description: Token de autenticação do usuário
         in: header
         name: X-Access-Token
@@ -161,7 +293,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/service.GainProjectionResponse'
+            $ref: '#/definitions/gpservice.GainProjectionResponse'
       summary: Criar uma Receita Prevista
       tags:
       - Gain-Projection
@@ -219,7 +351,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/service.GainProjectionResponse'
+            $ref: '#/definitions/gpservice.GainProjectionResponse'
       summary: Obter uma Receita Prevista
       tags:
       - Gain-Projection
@@ -233,7 +365,7 @@ paths:
         name: gain_projection
         required: true
         schema:
-          $ref: '#/definitions/service.UpdateRequest'
+          $ref: '#/definitions/gpservice.UpdateRequest'
       - description: Token de autenticação do usuário
         in: header
         name: X-Access-Token
@@ -245,7 +377,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/service.GainProjectionResponse'
+            $ref: '#/definitions/gpservice.GainProjectionResponse'
       summary: Editar uma Receita Prevista
       tags:
       - Gain-Projection
@@ -265,7 +397,7 @@ paths:
         name: gain
         required: true
         schema:
-          $ref: '#/definitions/service.CreateGainRequest'
+          $ref: '#/definitions/gpservice.CreateGainRequest'
       - description: Token de autenticação do usuário
         in: header
         name: X-Access-Token
@@ -277,8 +409,92 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/service.GainResponse'
+            $ref: '#/definitions/gpservice.GainResponse'
       summary: Realizar uma Receita Prevista
       tags:
       - Gain-Projection
+  /v1/gain/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Este endpoint permite remover uma receita
+      parameters:
+      - description: Id da receita
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/gain.ResponseDefault'
+            - properties:
+                message:
+                  type: string
+                status:
+                  type: integer
+              type: object
+      summary: Remove uma Receita
+      tags:
+      - Gain
+    get:
+      consumes:
+      - application/json
+      description: Este endpoint permite obter uma receita
+      parameters:
+      - description: Id da receita
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gservice.GainResponse'
+      summary: Obter uma Receita
+      tags:
+      - Gain
+    put:
+      consumes:
+      - application/json
+      description: Este endpoint permite editar uma receita
+      parameters:
+      - description: Modelo de edição da receita
+        in: body
+        name: gain
+        required: true
+        schema:
+          $ref: '#/definitions/gservice.UpdateRequest'
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gservice.GainResponse'
+      summary: Editar uma Receita
+      tags:
+      - Gain
 swagger: "2.0"

@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -21,8 +22,15 @@ type User struct {
 
 const AUTH_HEADER = "X-Access-Token"
 
+var allowedPaths = []string{
+	"/swagger/*any",
+}
+
 func AuthenticationMiddleware(ctx *gin.Context) {
 	log.Println("----Authentication------")
+	if slices.Contains(allowedPaths, ctx.FullPath()) {
+		return
+	}
 	idpAddress := fmt.Sprintf("%s:%s", os.Getenv("IDP_HOST"), os.Getenv("IDP_PORT"))
 	client := gocloak.NewClient(idpAddress)
 
@@ -48,14 +56,20 @@ func AuthorizationMiddleware(ctx *gin.Context) {
 	// ctx.Request.Header.Add("X-EXTRA", "TESTE123")
 	// ctx.Header("X-EXTRA2", "123TESTE")
 	log.Println("----Authorization------")
-
+	// if slices.Contains(allowedPaths, ctx.FullPath()) {
+	// 	return
+	// }
 	accessToken := ctx.GetHeader(AUTH_HEADER)
 	user := GetUser(accessToken)
-	fmt.Println(*user)
-
+	if user != nil {
+		fmt.Println(*user)
+	}
 }
 
 func GetUser(accessToken string) *User {
+	if accessToken == "" {
+		return nil
+	}
 	payload := splitToken(accessToken)[1]
 	userDecodedRaw, err := base64.RawStdEncoding.DecodeString(payload)
 	if err != nil {

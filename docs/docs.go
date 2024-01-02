@@ -24,6 +24,103 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/v1/gain": {
+            "get": {
+                "description": "Este endpoint permite obter uma listagem de receitas",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Gain"
+                ],
+                "summary": "Obter uma listagem de Receitas",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "O número de registros retornados pela busca",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "A página que será buscada",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "O mês que será filtrado a busca",
+                        "name": "month",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "O ano que será filtrado a busca",
+                        "name": "year",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/gservice.GainPaginateResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Este endpoint permite criar uma receita",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Gain"
+                ],
+                "summary": "Criar uma Receita",
+                "parameters": [
+                    {
+                        "description": "Modelo de criação da receita",
+                        "name": "gain",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/gservice.CreateRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/gservice.GainResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/gain-projection": {
             "get": {
                 "description": "Este endpoint permite obter uma listagem de receitas previstas",
@@ -76,7 +173,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/service.GainProjectionPaginateResponse"
+                            "$ref": "#/definitions/gpservice.GainProjectionPaginateResponse"
                         }
                     }
                 }
@@ -100,7 +197,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.CreateRequest"
+                            "$ref": "#/definitions/gpservice.CreateRequest"
                         }
                     },
                     {
@@ -115,7 +212,7 @@ var doc = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/service.GainProjectionResponse"
+                            "$ref": "#/definitions/gpservice.GainProjectionResponse"
                         }
                     }
                 }
@@ -154,7 +251,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/service.GainProjectionResponse"
+                            "$ref": "#/definitions/gpservice.GainProjectionResponse"
                         }
                     }
                 }
@@ -178,7 +275,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.UpdateRequest"
+                            "$ref": "#/definitions/gpservice.UpdateRequest"
                         }
                     },
                     {
@@ -193,7 +290,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/service.GainProjectionResponse"
+                            "$ref": "#/definitions/gpservice.GainProjectionResponse"
                         }
                     }
                 }
@@ -278,7 +375,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.CreateGainRequest"
+                            "$ref": "#/definitions/gpservice.CreateGainRequest"
                         }
                     },
                     {
@@ -293,7 +390,137 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/service.GainResponse"
+                            "$ref": "#/definitions/gpservice.GainResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/gain/{id}": {
+            "get": {
+                "description": "Este endpoint permite obter uma receita",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Gain"
+                ],
+                "summary": "Obter uma Receita",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id da receita",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/gservice.GainResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Este endpoint permite editar uma receita",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Gain"
+                ],
+                "summary": "Editar uma Receita",
+                "parameters": [
+                    {
+                        "description": "Modelo de edição da receita",
+                        "name": "gain",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/gservice.UpdateRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/gservice.GainResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Este endpoint permite remover uma receita",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Gain"
+                ],
+                "summary": "Remove uma Receita",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id da receita",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/gain.ResponseDefault"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -301,10 +528,13 @@ var doc = `{
         }
     },
     "definitions": {
+        "gain.ResponseDefault": {
+            "type": "object"
+        },
         "gainprojection.ResponseDefault": {
             "type": "object"
         },
-        "service.CategoryResponse": {
+        "gpservice.CategoryResponse": {
             "type": "object",
             "properties": {
                 "category": {
@@ -315,7 +545,7 @@ var doc = `{
                 }
             }
         },
-        "service.CreateGainRequest": {
+        "gpservice.CreateGainRequest": {
             "type": "object",
             "properties": {
                 "pay_in": {
@@ -326,7 +556,7 @@ var doc = `{
                 }
             }
         },
-        "service.CreateRequest": {
+        "gpservice.CreateRequest": {
             "type": "object",
             "properties": {
                 "category_id": {
@@ -349,7 +579,7 @@ var doc = `{
                 }
             }
         },
-        "service.GainProjectionPaginateResponse": {
+        "gpservice.GainProjectionPaginateResponse": {
             "type": "object",
             "properties": {
                 "current_page": {
@@ -361,7 +591,7 @@ var doc = `{
                 "records": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/service.GainProjectionResponse"
+                        "$ref": "#/definitions/gpservice.GainProjectionResponse"
                     }
                 },
                 "total_pages": {
@@ -372,11 +602,11 @@ var doc = `{
                 }
             }
         },
-        "service.GainProjectionResponse": {
+        "gpservice.GainProjectionResponse": {
             "type": "object",
             "properties": {
                 "category": {
-                    "$ref": "#/definitions/service.CategoryResponse"
+                    "$ref": "#/definitions/gpservice.CategoryResponse"
                 },
                 "description": {
                     "type": "string"
@@ -398,11 +628,11 @@ var doc = `{
                 }
             }
         },
-        "service.GainResponse": {
+        "gpservice.GainResponse": {
             "type": "object",
             "properties": {
                 "category": {
-                    "$ref": "#/definitions/service.CategoryResponse"
+                    "$ref": "#/definitions/gpservice.CategoryResponse"
                 },
                 "description": {
                     "type": "string"
@@ -424,7 +654,107 @@ var doc = `{
                 }
             }
         },
-        "service.UpdateRequest": {
+        "gpservice.UpdateRequest": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "is_passive": {
+                    "type": "boolean"
+                },
+                "pay_in": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "gservice.CategoryResponse": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gservice.CreateRequest": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "is_passive": {
+                    "type": "boolean"
+                },
+                "pay_in": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "gservice.GainPaginateResponse": {
+            "type": "object",
+            "properties": {
+                "current_page": {
+                    "type": "integer"
+                },
+                "page_limit": {
+                    "type": "integer"
+                },
+                "records": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/gservice.GainResponse"
+                    }
+                },
+                "total_pages": {
+                    "type": "integer"
+                },
+                "total_records": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gservice.GainResponse": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "$ref": "#/definitions/gservice.CategoryResponse"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "gain_projection_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_passive": {
+                    "type": "boolean"
+                },
+                "pay_in": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "gservice.UpdateRequest": {
             "type": "object",
             "properties": {
                 "category_id": {

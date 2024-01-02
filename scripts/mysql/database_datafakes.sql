@@ -27,3 +27,30 @@ VALUES
 ('cae0d5d8-c976-4cbb-a37a-c016bcdda9c5', 1702578712, '2023-12-03 00:00:00', 'Pix de aniversário', '45.00', false, false, 'user1', 11),
 ('a60f53bb-7805-46d8-bd6d-7b2983382b1a', 1702578712, '2023-12-03 00:00:00', 'Pix de aniversário', '300.00', false, false, 'user1', 11);
 
+
+INSERT INTO gain(id, created_at, pay_in, description, value, is_passive, user_id, category_id)
+VALUES
+('a945a36c-c406-4288-9b00-233f7c85d083', 1702578712, '2023-12-07 00:00:00', 'Recebimento de salário', '549.98', false, 'user1', 1),
+('6161dcd1-43aa-42df-aed4-e13eef21474f', 1702578712, '2023-11-07 00:00:00', 'Recebimento de salário', '549.98', false, 'user1', 1),
+('2036ed56-4974-4d2e-9089-06b081431f1d', 1702578712, '2023-12-14 00:00:00', 'Recebimento de dividendos', '403.65', true, 'user1', 6),
+('4a6c6ef8-80d5-4583-a8a9-0c20fcf687bf', 1702578712, '2023-12-10 00:00:00', 'Recebimento de aluguél', '5349.50', true, 'user1', 7),
+('df0c6526-3db1-4b68-aa7f-09113f00eabb', 1702578712, '2023-11-10 00:00:00', 'Recebimento de aluguél', '5349.50', true, 'user1', 7),
+('4533f73d-d3d5-47df-98c9-767f9ec99d5f', 1702578712, '2023-11-07 00:00:00', 'Recebimento de dividendos', '769.89', true, 'user1', 6),
+('2e600a9f-dd78-492c-8171-39dbab49971f', 1702578712, '2023-11-25 00:00:00', 'Rateio pizza', '49.58', false, 'user1', 10),
+('ef669e67-19a2-44bb-a378-a1060e0857a2', 1702578712, '2023-12-13 00:00:00', 'Recebimento de caixinha', '982.98', false, 'user1', 11),
+('590592b7-0365-4748-95cc-3d00fc864524', 1702578712, '2023-12-02 00:00:00', 'Rateio bebida', '68.90', false, 'user1', 10),
+('63cecb58-ce55-4b8e-b036-39d4ea708d55', 1702578712, '2023-12-17 00:00:00', 'Recebimento vaquinha', '1023.63', false, 'user1', 11),
+('22d97ed0-da60-4949-b799-124655042151', 1702578712, '2023-12-17 00:00:00', 'Boas festas', '356.77', false, 'user1', 11),
+('9f8544a6-2fa4-4405-a8db-e8615e1332af', 1702578712, '2023-12-05 00:00:00', 'Recebimento de aluguel', '10579.11', true, 'user1', 7),
+('d95dd125-844b-4728-b629-bbebbce41963', 1702578712, '2023-12-13 00:00:00', 'Rateio do lanche', '27.99', false, 'user1', 10),
+('ec3ad6f1-3558-4242-8061-dbacd28c0332', 1702578712, '2023-12-14 00:00:00', 'Rateio da coxinha', '19.98', false, 'user1', 10),
+('207acd63-6edb-440b-9a18-8c3bc3ea7cf2', 1702578712, '2023-12-14 00:00:00', 'Rateio do refri', '5.98', false, 'user1', 10),
+('7b515eaf-4cd0-4d6a-ab7d-c48c342020d4', 1702578712, '2023-12-14 00:00:00', 'Rateio do bolo', '25.57', false, 'user1', 10),
+('e8676fa2-725e-40d5-babc-ac137581aa1d', 1702578712, '2023-12-03 00:00:00', 'Pix de aniversário', '50.00', false, 'user1', 11),
+('2325c5ee-61ae-44c1-972b-85d6ad20326b', 1702578712, '2023-12-03 00:00:00', 'Pix de aniversário', '100.00', false, 'user1', 11),
+('220e7997-c945-4182-9042-40e7d26fcdd1', 1702578712, '2023-12-03 00:00:00', 'Pix de aniversário', '550.00', false, 'user1', 11),
+('5c4895ea-4652-4cf6-81e2-e12f2bbbb050', 1702578712, '2023-12-03 00:00:00', 'Pix de aniversário', '30.00', false, 'user1', 11),
+('0a220d30-fb11-460b-9009-6488914ea2dd', 1702578712, '2023-12-03 00:00:00', 'Pix de aniversário', '120.00', false, 'user1', 11),
+('8d8baa93-71df-4913-9a33-e97546c3f59d', 1702578712, '2023-12-03 00:00:00', 'Pix de aniversário', '70.00', false, 'user1', 11),
+('9597dce5-acbb-49c8-8056-ce2a7e7f24ea', 1702578712, '2023-12-03 00:00:00', 'Pix de aniversário', '45.00', false, 'user1', 11),
+('c14e2686-237c-4ede-bd1d-9547dc531cae', 1702578712, '2023-12-03 00:00:00', 'Pix de aniversário', '300.00', false, 'user1', 11);

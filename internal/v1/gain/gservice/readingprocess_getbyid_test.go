@@ -1,4 +1,4 @@
-package service
+package gservice
 
 import (
 	"context"
@@ -6,25 +6,25 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ruanlas/wallet-core-api/internal/v1/gainprojection/repository"
+	"github.com/ruanlas/wallet-core-api/internal/v1/gain/repository"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetByIdSuccess(t *testing.T) {
 	createdAt := time.Now()
-	gainProjectMock := repository.NewGainProjectionBuilder().
+	gainProjectMock := repository.NewGainBuilder().
 		AddId("cd1cc27b-28a1-47dc-ac76-70e8185e159d").
 		AddCreatedAt(createdAt).
 		AddPayIn(createdAt).
 		AddIsPassive(true).
-		AddIsAlreadyDone(false).
 		AddCategory(repository.GainCategory{Id: 2, Category: "Salário"}).
 		AddDescription("Description teste").
 		AddValue(750.50).
 		AddUserId("User1").
+		AddGainProjectionId("7172a75e-f41e-47df-a514-12580f34bd09").
 		Build()
 	_mockRepository := &mockRepository{}
-	_mockRepository.AddGetByIdCall(func(ctx context.Context, id string, userId string) (*repository.GainProjection, error) {
+	_mockRepository.AddGetByIdCall(func(ctx context.Context, id string, userId string) (*repository.Gain, error) {
 		return gainProjectMock, nil
 	})
 
@@ -44,7 +44,7 @@ func TestGetByIdSuccess(t *testing.T) {
 
 func TestGetByIdNotFound(t *testing.T) {
 	_mockRepository := &mockRepository{}
-	_mockRepository.AddGetByIdCall(func(ctx context.Context, id string, userId string) (*repository.GainProjection, error) {
+	_mockRepository.AddGetByIdCall(func(ctx context.Context, id string, userId string) (*repository.Gain, error) {
 		return nil, nil
 	})
 
@@ -64,7 +64,7 @@ func TestGetByIdNotFound(t *testing.T) {
 
 func TestGetByIdError(t *testing.T) {
 	_mockRepository := &mockRepository{}
-	_mockRepository.AddGetByIdCall(func(ctx context.Context, id string, userId string) (*repository.GainProjection, error) {
+	_mockRepository.AddGetByIdCall(func(ctx context.Context, id string, userId string) (*repository.Gain, error) {
 		return nil, errors.New("An error has been ocurred")
 	})
 

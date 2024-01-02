@@ -11,9 +11,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/ruanlas/wallet-core-api/internal/routes"
 	v1 "github.com/ruanlas/wallet-core-api/internal/v1"
+	"github.com/ruanlas/wallet-core-api/internal/v1/gain"
+	gainservice "github.com/ruanlas/wallet-core-api/internal/v1/gain/gservice"
+	gainrepository "github.com/ruanlas/wallet-core-api/internal/v1/gain/repository"
 	"github.com/ruanlas/wallet-core-api/internal/v1/gainprojection"
+	gainprojectionservice "github.com/ruanlas/wallet-core-api/internal/v1/gainprojection/gpservice"
 	gainprojectionrepository "github.com/ruanlas/wallet-core-api/internal/v1/gainprojection/repository"
-	gainprojectionservice "github.com/ruanlas/wallet-core-api/internal/v1/gainprojection/service"
 	uuid "github.com/satori/go.uuid"
 	"go.elastic.co/apm/module/apmsql"
 	_ "go.elastic.co/apm/module/apmsql/mysql"
@@ -77,7 +80,12 @@ func main() {
 	gainProjectionReadingProcess := gainprojectionservice.NewReadingProcess(gainProjectionRepository)
 	gainProjectionHandler := gainprojection.NewHandler(gainProjectionStorageProcess, gainProjectionReadingProcess)
 
-	apiV1 := v1.NewApi(gainProjectionHandler)
+	gainRepository := gainrepository.New(db)
+	gainStorageProcess := gainservice.NewStorageProcess(gainRepository, uuid.NewV4)
+	gainReadingProcess := gainservice.NewReadingProcess(gainRepository)
+	gainHandler := gain.NewHandler(gainStorageProcess, gainReadingProcess)
+
+	apiV1 := v1.NewApi(gainProjectionHandler, gainHandler)
 	router := routes.NewRouter(apiV1)
 	router.SetupRoutes()
 }

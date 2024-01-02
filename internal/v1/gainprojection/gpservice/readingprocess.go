@@ -1,4 +1,4 @@
-package service
+package gpservice
 
 import (
 	"github.com/ruanlas/wallet-core-api/internal/idpauth"
