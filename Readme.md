@@ -2,9 +2,9 @@
 
 # wallet-core-api
 
-O objetivo deste projeto é oferecer recursos para a gestão financeira pessoal.
+O objetivo deste projeto é oferecer uma api com recursos para a gestão financeira pessoal.
 
-Ele permitirá lançar projeções de receitas e gastos, além de permitir lançar também os gastos e receitas efetivadas.
+Ele permitirá lançar projeções de receitas e gastos, além de permitir lançar também os gastos e receitas que foram realizadas.
 
 ## Índice
 <!--ts-->
