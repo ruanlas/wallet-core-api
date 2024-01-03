@@ -525,6 +525,281 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/v1/invoice-projection": {
+            "get": {
+                "description": "Este endpoint permite obter uma listagem de despesas previstas",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Invoice-Projection"
+                ],
+                "summary": "Obter uma listagem de Despesas Previstas",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "O número de registros retornados pela busca",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "A página que será buscada",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "O mês que será filtrado a busca",
+                        "name": "month",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "O ano que será filtrado a busca",
+                        "name": "year",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ipservice.InvoiceProjectionPaginateResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Este endpoint permite criar uma despesa prevista",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Invoice-Projection"
+                ],
+                "summary": "Criar uma Despesa Prevista",
+                "parameters": [
+                    {
+                        "description": "Modelo de criação da despesa prevista",
+                        "name": "invoice_projection",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ipservice.CreateRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/ipservice.InvoiceProjectionResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/invoice-projection/{id}": {
+            "get": {
+                "description": "Este endpoint permite obter uma despesa prevista",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Invoice-Projection"
+                ],
+                "summary": "Obter uma Despesa Prevista",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id da despesa prevista",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ipservice.InvoiceProjectionResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Este endpoint permite editar uma despesa prevista",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Invoice-Projection"
+                ],
+                "summary": "Editar uma Despesa Prevista",
+                "parameters": [
+                    {
+                        "description": "Modelo de edição da despesa prevista",
+                        "name": "invoice_projection",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ipservice.UpdateRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ipservice.InvoiceProjectionResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Este endpoint permite remover uma despesa prevista",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Invoice-Projection"
+                ],
+                "summary": "Remove uma Despesa Prevista",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id da despesa prevista",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/invoiceprojection.ResponseDefault"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/invoice-projection/{id}/create-invoice": {
+            "post": {
+                "description": "Este endpoint permite realizar uma despesa que foi prevista",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Invoice-Projection"
+                ],
+                "summary": "Realizar uma Despesa Prevista",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id da despesa prevista",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Modelo de criação da despesa",
+                        "name": "invoice",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ipservice.CreateInvoiceRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ipservice.InvoiceResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -768,6 +1043,175 @@ var doc = `{
                 },
                 "pay_in": {
                     "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "invoiceprojection.ResponseDefault": {
+            "type": "object"
+        },
+        "ipservice.CategoryResponse": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "ipservice.CreateInvoiceRequest": {
+            "type": "object",
+            "properties": {
+                "buy_at": {
+                    "type": "string"
+                },
+                "pay_in": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "ipservice.CreateRequest": {
+            "type": "object",
+            "properties": {
+                "buy_at": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "pay_in": {
+                    "type": "string"
+                },
+                "payment_type_id": {
+                    "type": "integer"
+                },
+                "recurrence": {
+                    "type": "integer"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "ipservice.InvoiceProjectionPaginateResponse": {
+            "type": "object",
+            "properties": {
+                "current_page": {
+                    "type": "integer"
+                },
+                "page_limit": {
+                    "type": "integer"
+                },
+                "records": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ipservice.InvoiceProjectionResponse"
+                    }
+                },
+                "total_pages": {
+                    "type": "integer"
+                },
+                "total_records": {
+                    "type": "integer"
+                }
+            }
+        },
+        "ipservice.InvoiceProjectionResponse": {
+            "type": "object",
+            "properties": {
+                "buy_at": {
+                    "type": "string"
+                },
+                "category": {
+                    "$ref": "#/definitions/ipservice.CategoryResponse"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "pay_in": {
+                    "type": "string"
+                },
+                "payment_type": {
+                    "$ref": "#/definitions/ipservice.PaymentTypeResponse"
+                },
+                "recurrence": {
+                    "type": "integer"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "ipservice.InvoiceResponse": {
+            "type": "object",
+            "properties": {
+                "buy_at": {
+                    "type": "string"
+                },
+                "category": {
+                    "$ref": "#/definitions/ipservice.CategoryResponse"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "invoice_projection_id": {
+                    "type": "string"
+                },
+                "pay_at": {
+                    "type": "string"
+                },
+                "payment_type": {
+                    "$ref": "#/definitions/ipservice.PaymentTypeResponse"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "ipservice.PaymentTypeResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "ipservice.UpdateRequest": {
+            "type": "object",
+            "properties": {
+                "buy_at": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "pay_in": {
+                    "type": "string"
+                },
+                "payment_type_id": {
+                    "type": "integer"
                 },
                 "value": {
                     "type": "number"

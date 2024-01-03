@@ -160,6 +160,116 @@ definitions:
       value:
         type: number
     type: object
+  invoiceprojection.ResponseDefault:
+    type: object
+  ipservice.CategoryResponse:
+    properties:
+      category:
+        type: string
+      id:
+        type: integer
+    type: object
+  ipservice.CreateInvoiceRequest:
+    properties:
+      buy_at:
+        type: string
+      pay_in:
+        type: string
+      value:
+        type: number
+    type: object
+  ipservice.CreateRequest:
+    properties:
+      buy_at:
+        type: string
+      category_id:
+        type: integer
+      description:
+        type: string
+      pay_in:
+        type: string
+      payment_type_id:
+        type: integer
+      recurrence:
+        type: integer
+      value:
+        type: number
+    type: object
+  ipservice.InvoiceProjectionPaginateResponse:
+    properties:
+      current_page:
+        type: integer
+      page_limit:
+        type: integer
+      records:
+        items:
+          $ref: '#/definitions/ipservice.InvoiceProjectionResponse'
+        type: array
+      total_pages:
+        type: integer
+      total_records:
+        type: integer
+    type: object
+  ipservice.InvoiceProjectionResponse:
+    properties:
+      buy_at:
+        type: string
+      category:
+        $ref: '#/definitions/ipservice.CategoryResponse'
+      description:
+        type: string
+      id:
+        type: string
+      pay_in:
+        type: string
+      payment_type:
+        $ref: '#/definitions/ipservice.PaymentTypeResponse'
+      recurrence:
+        type: integer
+      value:
+        type: number
+    type: object
+  ipservice.InvoiceResponse:
+    properties:
+      buy_at:
+        type: string
+      category:
+        $ref: '#/definitions/ipservice.CategoryResponse'
+      description:
+        type: string
+      id:
+        type: string
+      invoice_projection_id:
+        type: string
+      pay_at:
+        type: string
+      payment_type:
+        $ref: '#/definitions/ipservice.PaymentTypeResponse'
+      value:
+        type: number
+    type: object
+  ipservice.PaymentTypeResponse:
+    properties:
+      id:
+        type: integer
+      type:
+        type: string
+    type: object
+  ipservice.UpdateRequest:
+    properties:
+      buy_at:
+        type: string
+      category_id:
+        type: integer
+      description:
+        type: string
+      pay_in:
+        type: string
+      payment_type_id:
+        type: integer
+      value:
+        type: number
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -497,4 +607,185 @@ paths:
       summary: Editar uma Receita
       tags:
       - Gain
+  /v1/invoice-projection:
+    get:
+      consumes:
+      - application/json
+      description: Este endpoint permite obter uma listagem de despesas previstas
+      parameters:
+      - description: O número de registros retornados pela busca
+        in: query
+        name: page_size
+        type: string
+      - description: A página que será buscada
+        in: query
+        name: page
+        type: string
+      - description: O mês que será filtrado a busca
+        in: query
+        name: month
+        required: true
+        type: string
+      - description: O ano que será filtrado a busca
+        in: query
+        name: year
+        required: true
+        type: string
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ipservice.InvoiceProjectionPaginateResponse'
+      summary: Obter uma listagem de Despesas Previstas
+      tags:
+      - Invoice-Projection
+    post:
+      consumes:
+      - application/json
+      description: Este endpoint permite criar uma despesa prevista
+      parameters:
+      - description: Modelo de criação da despesa prevista
+        in: body
+        name: invoice_projection
+        required: true
+        schema:
+          $ref: '#/definitions/ipservice.CreateRequest'
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/ipservice.InvoiceProjectionResponse'
+      summary: Criar uma Despesa Prevista
+      tags:
+      - Invoice-Projection
+  /v1/invoice-projection/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Este endpoint permite remover uma despesa prevista
+      parameters:
+      - description: Id da despesa prevista
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/invoiceprojection.ResponseDefault'
+            - properties:
+                message:
+                  type: string
+                status:
+                  type: integer
+              type: object
+      summary: Remove uma Despesa Prevista
+      tags:
+      - Invoice-Projection
+    get:
+      consumes:
+      - application/json
+      description: Este endpoint permite obter uma despesa prevista
+      parameters:
+      - description: Id da despesa prevista
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ipservice.InvoiceProjectionResponse'
+      summary: Obter uma Despesa Prevista
+      tags:
+      - Invoice-Projection
+    put:
+      consumes:
+      - application/json
+      description: Este endpoint permite editar uma despesa prevista
+      parameters:
+      - description: Modelo de edição da despesa prevista
+        in: body
+        name: invoice_projection
+        required: true
+        schema:
+          $ref: '#/definitions/ipservice.UpdateRequest'
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ipservice.InvoiceProjectionResponse'
+      summary: Editar uma Despesa Prevista
+      tags:
+      - Invoice-Projection
+  /v1/invoice-projection/{id}/create-invoice:
+    post:
+      consumes:
+      - application/json
+      description: Este endpoint permite realizar uma despesa que foi prevista
+      parameters:
+      - description: Id da despesa prevista
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Modelo de criação da despesa
+        in: body
+        name: invoice
+        required: true
+        schema:
+          $ref: '#/definitions/ipservice.CreateInvoiceRequest'
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ipservice.InvoiceResponse'
+      summary: Realizar uma Despesa Prevista
+      tags:
+      - Invoice-Projection
 swagger: "2.0"
