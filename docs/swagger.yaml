@@ -160,6 +160,8 @@ definitions:
       value:
         type: number
     type: object
+  invoice.ResponseDefault:
+    type: object
   invoiceprojection.ResponseDefault:
     type: object
   ipservice.CategoryResponse:
@@ -264,6 +266,84 @@ definitions:
       description:
         type: string
       pay_in:
+        type: string
+      payment_type_id:
+        type: integer
+      value:
+        type: number
+    type: object
+  iservice.CategoryResponse:
+    properties:
+      category:
+        type: string
+      id:
+        type: integer
+    type: object
+  iservice.CreateRequest:
+    properties:
+      buy_at:
+        type: string
+      category_id:
+        type: integer
+      description:
+        type: string
+      pay_at:
+        type: string
+      payment_type_id:
+        type: integer
+      value:
+        type: number
+    type: object
+  iservice.InvoicePaginateResponse:
+    properties:
+      current_page:
+        type: integer
+      page_limit:
+        type: integer
+      records:
+        items:
+          $ref: '#/definitions/iservice.InvoiceResponse'
+        type: array
+      total_pages:
+        type: integer
+      total_records:
+        type: integer
+    type: object
+  iservice.InvoiceResponse:
+    properties:
+      buy_at:
+        type: string
+      category:
+        $ref: '#/definitions/iservice.CategoryResponse'
+      description:
+        type: string
+      id:
+        type: string
+      invoice_projection_id:
+        type: string
+      pay_at:
+        type: string
+      payment_type:
+        $ref: '#/definitions/iservice.PaymentTypeResponse'
+      value:
+        type: number
+    type: object
+  iservice.PaymentTypeResponse:
+    properties:
+      id:
+        type: integer
+      type:
+        type: string
+    type: object
+  iservice.UpdateRequest:
+    properties:
+      buy_at:
+        type: string
+      category_id:
+        type: integer
+      description:
+        type: string
+      pay_at:
         type: string
       payment_type_id:
         type: integer
@@ -607,6 +687,71 @@ paths:
       summary: Editar uma Receita
       tags:
       - Gain
+  /v1/invoice:
+    get:
+      consumes:
+      - application/json
+      description: Este endpoint permite obter uma listagem de despesas
+      parameters:
+      - description: O número de registros retornados pela busca
+        in: query
+        name: page_size
+        type: string
+      - description: A página que será buscada
+        in: query
+        name: page
+        type: string
+      - description: O mês que será filtrado a busca
+        in: query
+        name: month
+        required: true
+        type: string
+      - description: O ano que será filtrado a busca
+        in: query
+        name: year
+        required: true
+        type: string
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/iservice.InvoicePaginateResponse'
+      summary: Obter uma listagem de Despesas
+      tags:
+      - Invoice
+    post:
+      consumes:
+      - application/json
+      description: Este endpoint permite criar uma despesa
+      parameters:
+      - description: Modelo de criação da despesa
+        in: body
+        name: invoice
+        required: true
+        schema:
+          $ref: '#/definitions/iservice.CreateRequest'
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/iservice.InvoiceResponse'
+      summary: Criar uma Despesa
+      tags:
+      - Invoice
   /v1/invoice-projection:
     get:
       consumes:
@@ -788,4 +933,88 @@ paths:
       summary: Realizar uma Despesa Prevista
       tags:
       - Invoice-Projection
+  /v1/invoice/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Este endpoint permite remover uma despesa
+      parameters:
+      - description: Id da despesa
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/invoice.ResponseDefault'
+            - properties:
+                message:
+                  type: string
+                status:
+                  type: integer
+              type: object
+      summary: Remove uma Despesa
+      tags:
+      - Invoice
+    get:
+      consumes:
+      - application/json
+      description: Este endpoint permite obter uma despesa
+      parameters:
+      - description: Id da despesa
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/iservice.InvoiceResponse'
+      summary: Obter uma Despesa
+      tags:
+      - Invoice
+    put:
+      consumes:
+      - application/json
+      description: Este endpoint permite editar uma despesa
+      parameters:
+      - description: Modelo de edição da despesa
+        in: body
+        name: invoice
+        required: true
+        schema:
+          $ref: '#/definitions/iservice.UpdateRequest'
+      - description: Token de autenticação do usuário
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/iservice.InvoiceResponse'
+      summary: Editar uma Despesa
+      tags:
+      - Invoice
 swagger: "2.0"

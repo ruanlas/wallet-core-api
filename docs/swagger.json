@@ -511,6 +511,103 @@
                 }
             }
         },
+        "/v1/invoice": {
+            "get": {
+                "description": "Este endpoint permite obter uma listagem de despesas",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Invoice"
+                ],
+                "summary": "Obter uma listagem de Despesas",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "O número de registros retornados pela busca",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "A página que será buscada",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "O mês que será filtrado a busca",
+                        "name": "month",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "O ano que será filtrado a busca",
+                        "name": "year",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/iservice.InvoicePaginateResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Este endpoint permite criar uma despesa",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Invoice"
+                ],
+                "summary": "Criar uma Despesa",
+                "parameters": [
+                    {
+                        "description": "Modelo de criação da despesa",
+                        "name": "invoice",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/iservice.CreateRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/iservice.InvoiceResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/invoice-projection": {
             "get": {
                 "description": "Este endpoint permite obter uma listagem de despesas previstas",
@@ -785,6 +882,136 @@
                     }
                 }
             }
+        },
+        "/v1/invoice/{id}": {
+            "get": {
+                "description": "Este endpoint permite obter uma despesa",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Invoice"
+                ],
+                "summary": "Obter uma Despesa",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id da despesa",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/iservice.InvoiceResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Este endpoint permite editar uma despesa",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Invoice"
+                ],
+                "summary": "Editar uma Despesa",
+                "parameters": [
+                    {
+                        "description": "Modelo de edição da despesa",
+                        "name": "invoice",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/iservice.UpdateRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/iservice.InvoiceResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Este endpoint permite remover uma despesa",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Invoice"
+                ],
+                "summary": "Remove uma Despesa",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id da despesa",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token de autenticação do usuário",
+                        "name": "X-Access-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/invoice.ResponseDefault"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1034,6 +1261,9 @@
                 }
             }
         },
+        "invoice.ResponseDefault": {
+            "type": "object"
+        },
         "invoiceprojection.ResponseDefault": {
             "type": "object"
         },
@@ -1193,6 +1423,126 @@
                     "type": "string"
                 },
                 "pay_in": {
+                    "type": "string"
+                },
+                "payment_type_id": {
+                    "type": "integer"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "iservice.CategoryResponse": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "iservice.CreateRequest": {
+            "type": "object",
+            "properties": {
+                "buy_at": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "pay_at": {
+                    "type": "string"
+                },
+                "payment_type_id": {
+                    "type": "integer"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "iservice.InvoicePaginateResponse": {
+            "type": "object",
+            "properties": {
+                "current_page": {
+                    "type": "integer"
+                },
+                "page_limit": {
+                    "type": "integer"
+                },
+                "records": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/iservice.InvoiceResponse"
+                    }
+                },
+                "total_pages": {
+                    "type": "integer"
+                },
+                "total_records": {
+                    "type": "integer"
+                }
+            }
+        },
+        "iservice.InvoiceResponse": {
+            "type": "object",
+            "properties": {
+                "buy_at": {
+                    "type": "string"
+                },
+                "category": {
+                    "$ref": "#/definitions/iservice.CategoryResponse"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "invoice_projection_id": {
+                    "type": "string"
+                },
+                "pay_at": {
+                    "type": "string"
+                },
+                "payment_type": {
+                    "$ref": "#/definitions/iservice.PaymentTypeResponse"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "iservice.PaymentTypeResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "iservice.UpdateRequest": {
+            "type": "object",
+            "properties": {
+                "buy_at": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "pay_at": {
                     "type": "string"
                 },
                 "payment_type_id": {

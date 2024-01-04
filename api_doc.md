@@ -265,6 +265,124 @@ Este endpoint permite realizar uma receita que foi prevista
 | 200 | OK | [gpservice.GainResponse](#gpservicegainresponse) |
 
 ---
+### /v1/invoice
+
+#### GET
+##### Summary
+
+Obter uma listagem de Despesas
+
+##### Description
+
+Este endpoint permite obter uma listagem de despesas
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| page_size | query | O número de registros retornados pela busca | No | string |
+| page | query | A página que será buscada | No | string |
+| month | query | O mês que será filtrado a busca | Yes | string |
+| year | query | O ano que será filtrado a busca | Yes | string |
+| X-Access-Token | header | Token de autenticação do usuário | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | OK | [iservice.InvoicePaginateResponse](#iserviceinvoicepaginateresponse) |
+
+#### POST
+##### Summary
+
+Criar uma Despesa
+
+##### Description
+
+Este endpoint permite criar uma despesa
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| invoice | body | Modelo de criação da despesa | Yes | [iservice.CreateRequest](#iservicecreaterequest) |
+| X-Access-Token | header | Token de autenticação do usuário | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 201 | Created | [iservice.InvoiceResponse](#iserviceinvoiceresponse) |
+
+### /v1/invoice/{id}
+
+#### DELETE
+##### Summary
+
+Remove uma Despesa
+
+##### Description
+
+Este endpoint permite remover uma despesa
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| id | path | Id da despesa | Yes | string |
+| X-Access-Token | header | Token de autenticação do usuário | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | OK | [invoice.ResponseDefault](#invoiceresponsedefault) & { **"message"**: string, **"status"**: integer } |
+
+#### GET
+##### Summary
+
+Obter uma Despesa
+
+##### Description
+
+Este endpoint permite obter uma despesa
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| id | path | Id da despesa | Yes | string |
+| X-Access-Token | header | Token de autenticação do usuário | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | OK | [iservice.InvoiceResponse](#iserviceinvoiceresponse) |
+
+#### PUT
+##### Summary
+
+Editar uma Despesa
+
+##### Description
+
+Este endpoint permite editar uma despesa
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| invoice | body | Modelo de edição da despesa | Yes | [iservice.UpdateRequest](#iserviceupdaterequest) |
+| X-Access-Token | header | Token de autenticação do usuário | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | OK | [iservice.InvoiceResponse](#iserviceinvoiceresponse) |
+
+---
 ### /v1/invoice-projection
 
 #### GET
@@ -540,6 +658,12 @@ Este endpoint permite realizar uma despesa que foi prevista
 | pay_in | string |  | No |
 | value | number |  | No |
 
+#### invoice.ResponseDefault
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| invoice.ResponseDefault | object |  |  |
+
 #### invoiceprojection.ResponseDefault
 
 | Name | Type | Description | Required |
@@ -624,5 +748,64 @@ Este endpoint permite realizar uma despesa que foi prevista
 | category_id | integer |  | No |
 | description | string |  | No |
 | pay_in | string |  | No |
+| payment_type_id | integer |  | No |
+| value | number |  | No |
+
+#### iservice.CategoryResponse
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| category | string |  | No |
+| id | integer |  | No |
+
+#### iservice.CreateRequest
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| buy_at | string |  | No |
+| category_id | integer |  | No |
+| description | string |  | No |
+| pay_at | string |  | No |
+| payment_type_id | integer |  | No |
+| value | number |  | No |
+
+#### iservice.InvoicePaginateResponse
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| current_page | integer |  | No |
+| page_limit | integer |  | No |
+| records | [ [iservice.InvoiceResponse](#iserviceinvoiceresponse) ] |  | No |
+| total_pages | integer |  | No |
+| total_records | integer |  | No |
+
+#### iservice.InvoiceResponse
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| buy_at | string |  | No |
+| category | [iservice.CategoryResponse](#iservicecategoryresponse) |  | No |
+| description | string |  | No |
+| id | string |  | No |
+| invoice_projection_id | string |  | No |
+| pay_at | string |  | No |
+| payment_type | [iservice.PaymentTypeResponse](#iservicepaymenttyperesponse) |  | No |
+| value | number |  | No |
+
+#### iservice.PaymentTypeResponse
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| id | integer |  | No |
+| type | string |  | No |
+
+#### iservice.UpdateRequest
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| buy_at | string |  | No |
+| category_id | integer |  | No |
+| description | string |  | No |
+| pay_at | string |  | No |
 | payment_type_id | integer |  | No |
 | value | number |  | No |
