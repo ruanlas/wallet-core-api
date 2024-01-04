@@ -1,67 +1,6 @@
-package ipservice
+package iservice
 
 import "time"
-
-type InvoiceProjectionResponseBuilder struct {
-	id          string
-	payIn       time.Time
-	buyAt       time.Time
-	description string
-	value       float64
-	recurrence  uint
-	category    CategoryResponse
-	paymentType PaymentTypeResponse
-}
-
-func NewInvoiceProjectionResponseBuilder() *InvoiceProjectionResponseBuilder {
-	return &InvoiceProjectionResponseBuilder{}
-}
-func (builder *InvoiceProjectionResponseBuilder) AddId(id string) *InvoiceProjectionResponseBuilder {
-	builder.id = id
-	return builder
-}
-func (builder *InvoiceProjectionResponseBuilder) AddPayIn(payIn time.Time) *InvoiceProjectionResponseBuilder {
-	builder.payIn = payIn
-	return builder
-}
-func (builder *InvoiceProjectionResponseBuilder) AddBuyAt(buyAt time.Time) *InvoiceProjectionResponseBuilder {
-	builder.buyAt = buyAt
-	return builder
-}
-func (builder *InvoiceProjectionResponseBuilder) AddDescription(description string) *InvoiceProjectionResponseBuilder {
-	builder.description = description
-	return builder
-}
-func (builder *InvoiceProjectionResponseBuilder) AddValue(value float64) *InvoiceProjectionResponseBuilder {
-	builder.value = value
-	return builder
-}
-func (builder *InvoiceProjectionResponseBuilder) AddPaymentType(paymentType PaymentTypeResponse) *InvoiceProjectionResponseBuilder {
-	builder.paymentType = paymentType
-	return builder
-}
-func (builder *InvoiceProjectionResponseBuilder) AddRecurrence(recurrence uint) *InvoiceProjectionResponseBuilder {
-	builder.recurrence = recurrence
-	return builder
-}
-func (builder *InvoiceProjectionResponseBuilder) AddCategory(category CategoryResponse) *InvoiceProjectionResponseBuilder {
-	builder.category = category
-	return builder
-}
-func (builder *InvoiceProjectionResponseBuilder) Build() *InvoiceProjectionResponse {
-	invoiceProjectionResponse := InvoiceProjectionResponse{}
-
-	invoiceProjectionResponse.Id = builder.id
-	invoiceProjectionResponse.Description = builder.description
-	invoiceProjectionResponse.Value = builder.value
-	invoiceProjectionResponse.PayIn = builder.payIn
-	invoiceProjectionResponse.BuyAt = builder.buyAt
-	invoiceProjectionResponse.PaymentType = builder.paymentType
-	invoiceProjectionResponse.Recurrence = builder.recurrence
-	invoiceProjectionResponse.Category = builder.category
-
-	return &invoiceProjectionResponse
-}
 
 type SearchParamsBuilder struct {
 	month    *uint
@@ -153,8 +92,8 @@ func (builder *InvoiceResponseBuilder) Build() *InvoiceResponse {
 	invoiceResponse.Id = builder.id
 	invoiceResponse.Description = builder.description
 	invoiceResponse.Value = builder.value
-	invoiceResponse.PayAt = builder.payAt
 	invoiceResponse.BuyAt = builder.buyAt
+	invoiceResponse.PayAt = builder.payAt
 	invoiceResponse.PaymentType = builder.paymentType
 	invoiceResponse.InvoiceProjectionId = builder.invoiceProjectionId
 	invoiceResponse.Category = builder.category

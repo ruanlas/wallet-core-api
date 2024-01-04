@@ -4,7 +4,11 @@
 
 O objetivo deste projeto é oferecer uma api com recursos para a gestão financeira pessoal.
 
-Ele permitirá lançar projeções de receitas e gastos, além de permitir lançar também os gastos e receitas que foram realizadas.
+Os recursos disponíveis no momento são:
+   * Cadastro de projeção de receitas
+   * Cadastro de receitas
+   * Cadastro de projeção de despesas
+   * Cadastro de despesas
 
 ## Índice
 <!--ts-->
