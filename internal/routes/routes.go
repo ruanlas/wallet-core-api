@@ -51,6 +51,12 @@ func (r *Router) SetupRoutes() {
 	v1router.DELETE("/invoice-projection/:id", r.apiV1.GetInvoiceProjectionHandler().Delete)
 	v1router.POST("/invoice-projection/:id/create-invoice", r.apiV1.GetInvoiceProjectionHandler().CreateInvoice)
 
+	v1router.POST("/invoice", r.apiV1.GetInvoiceHandler().Create)
+	v1router.GET("/invoice", r.apiV1.GetInvoiceHandler().GetAll)
+	v1router.GET("/invoice/:id", r.apiV1.GetInvoiceHandler().GetById)
+	v1router.PUT("/invoice/:id", r.apiV1.GetInvoiceHandler().Update)
+	v1router.DELETE("/invoice/:id", r.apiV1.GetInvoiceHandler().Delete)
+
 	serviceAddr := fmt.Sprintf(":%s", servicePort)
 	router.Run(serviceAddr)
 }

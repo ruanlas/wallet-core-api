@@ -17,9 +17,13 @@ import (
 	"github.com/ruanlas/wallet-core-api/internal/v1/gainprojection"
 	gainprojectionservice "github.com/ruanlas/wallet-core-api/internal/v1/gainprojection/gpservice"
 	gainprojectionrepository "github.com/ruanlas/wallet-core-api/internal/v1/gainprojection/repository"
+	"github.com/ruanlas/wallet-core-api/internal/v1/invoice"
 	"github.com/ruanlas/wallet-core-api/internal/v1/invoiceprojection"
 	invoiceprojectionservice "github.com/ruanlas/wallet-core-api/internal/v1/invoiceprojection/ipservice"
 	invoiceprojectionrepository "github.com/ruanlas/wallet-core-api/internal/v1/invoiceprojection/repository"
+
+	invoiceservice "github.com/ruanlas/wallet-core-api/internal/v1/invoice/iservice"
+	invoicerepository "github.com/ruanlas/wallet-core-api/internal/v1/invoice/repository"
 	uuid "github.com/satori/go.uuid"
 	"go.elastic.co/apm/module/apmsql"
 	_ "go.elastic.co/apm/module/apmsql/mysql"
@@ -94,7 +98,12 @@ func main() {
 	invoiceProjectionReadingProcess := invoiceprojectionservice.NewReadingProcess(invoiceProjectionRepository)
 	invoiceProjectionHandler := invoiceprojection.NewHandler(invoiceProjectionStorageProcess, invoiceProjectionReadingProcess)
 
-	apiV1 := v1.NewApi(gainProjectionHandler, gainHandler, invoiceProjectionHandler)
+	invoiceRepository := invoicerepository.New(db)
+	invoiceStorageProcess := invoiceservice.NewStorageProcess(invoiceRepository, uuid.NewV4)
+	invoiceReadingProcess := invoiceservice.NewReadingProcess(invoiceRepository)
+	invoiceHandler := invoice.NewHandler(invoiceStorageProcess, invoiceReadingProcess)
+
+	apiV1 := v1.NewApi(gainProjectionHandler, gainHandler, invoiceProjectionHandler, invoiceHandler)
 	router := routes.NewRouter(apiV1)
 	router.SetupRoutes()
 }
