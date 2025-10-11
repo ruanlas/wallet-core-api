@@ -1,11 +1,12 @@
 module github.com/ruanlas/wallet-core-api
 
-go 1.21.3
+go 1.25.2
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/Nerzal/gocloak/v13 v13.8.0
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
+	github.com/caarlos0/env/v11 v11.3.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/joho/godotenv v1.5.1
 	github.com/prometheus/client_golang v1.17.0

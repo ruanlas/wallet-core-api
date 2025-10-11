@@ -1,0 +1,38 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${fileDirname}", // Debugs the currently active Go file
+            "env": {
+                "DATABASE_HOST": "localhost",
+                "DATABASE_NAME": "wallet_core",
+                "DATABASE_PASSWORD": "",
+                "DATABASE_PORT": "3306",
+                "DATABASE_USERNAME": "root",
+                "ELASTIC_APM_CAPTURE_BODY": "all",
+                "ELASTIC_APM_ENVIRONMENT": "dev",
+                "ELASTIC_APM_SERVER_URL": "localhost:8200",
+                "ELASTIC_APM_SERVICE_NAME": "wallet-core",
+                "ELASTIC_APM_SERVICE_VERSION": "beta",
+                "ELASTIC_APM_VERIFY_SERVER_CERT": "false",
+                "IDP_CLIENT_IDENTIFIER": "wallet-api",
+                "IDP_CLIENT_SECRET": "",
+                "IDP_HOST": "http://localhost",
+                "IDP_MAIN_REALM": "master",
+                "IDP_PASSWORD_ADMIN": "",
+                "IDP_PORT": "8081",
+                "IDP_REALM": "wallet",
+                "IDP_USER_ADMIN": "",
+                "PROMETHEUS_PORT": "2112",
+                "SERVICE_HOST": "localhost",
+                "SERVICE_NAME": "wallet-core",
+                "SERVICE_PORT": "8080"
+            }, // Optional: Environment variables
+            "args": [] // Optional: Command-line arguments
+        }
+    ]
+}

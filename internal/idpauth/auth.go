@@ -27,6 +27,7 @@ var allowedPaths = []string{
 }
 
 func AuthenticationMiddleware(ctx *gin.Context) {
+	return
 	log.Println("----Authentication------")
 	if slices.Contains(allowedPaths, ctx.FullPath()) {
 		return
@@ -46,6 +47,7 @@ func AuthenticationMiddleware(ctx *gin.Context) {
 }
 
 func AuthorizationMiddleware(ctx *gin.Context) {
+	return
 	// log.Println(ctx.Request.URL)
 	// log.Println(ctx.Request.Method)
 	// fmt.Println(ctx.HandlerName())
