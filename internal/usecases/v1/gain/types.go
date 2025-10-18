@@ -41,11 +41,6 @@ type UpdateRequest struct {
 	CategoryId  uint      `json:"category_id"`
 }
 
-type CreateGainRequest struct {
-	Value float64   `json:"value"`
-	PayIn time.Time `json:"pay_in"`
-}
-
 type CategoryResponse struct {
 	Id       uint   `json:"id"`
 	Category string `json:"category"`
@@ -59,12 +54,6 @@ type GainResponse struct {
 	Value            float64          `json:"value"`
 	IsPassive        bool             `json:"is_passive"`
 	Category         CategoryResponse `json:"category"`
-}
-
-type GainStat struct {
-	ProjectionIsFound       bool
-	ProjectionIsAlreadyDone bool
-	Gain                    *GainResponse
 }
 
 type GainPaginateResponse struct {

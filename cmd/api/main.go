@@ -53,6 +53,7 @@ func init() {
 	)
 }
 
+// TODO: isolar em outro pacote de monitoramento para expor as métricas e o healthcheck
 func startPrometheus() {
 	prometheusPort := os.Getenv("PROMETHEUS_PORT")
 	log.Println("Prometheus metrics on /metrics port", prometheusPort)
